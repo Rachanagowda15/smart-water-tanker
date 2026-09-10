@@ -1,0 +1,3238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Water Tanker</title>
+
+
+    <!-- LEAFLET MAP -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+
+    <style>
+
+        /* =====================================================
+           GENERAL
+        ===================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+
+        body {
+
+            background: #06182b;
+
+            color: white;
+
+            min-height: 100vh;
+
+        }
+
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .sidebar {
+
+            position: fixed;
+
+            left: 0;
+            top: 0;
+
+            width: 205px;
+
+            height: 100vh;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #09284a,
+                    #06172d
+                );
+
+            border-right:
+                1px solid #1b5a91;
+
+            padding: 35px 12px;
+
+            z-index: 1000;
+
+        }
+
+
+        .side-logo {
+
+            text-align: center;
+
+            font-size: 50px;
+
+            margin-bottom: 35px;
+
+        }
+
+
+        .menu {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 12px;
+
+        }
+
+
+        .menu-item {
+
+            padding: 15px 14px;
+
+            border-radius: 14px;
+
+            color: #c5ddff;
+
+            font-size: 17px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+
+        }
+
+
+        .menu-item:hover {
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #087ff5,
+                    #1554b8
+                );
+
+            color: white;
+
+            transform: translateX(3px);
+
+        }
+
+
+        .menu-item.active {
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #078cff,
+                    #1856bd
+                );
+
+            color: white;
+
+            box-shadow:
+                0 5px 20px
+                rgba(0,150,255,0.35);
+
+        }
+
+
+        .menu-icon {
+
+            font-size: 25px;
+
+            width: 30px;
+
+            text-align: center;
+
+        }
+
+
+        .side-bottom {
+
+            position: absolute;
+
+            bottom: 25px;
+
+            left: 15px;
+
+            right: 15px;
+
+            text-align: center;
+
+            color: #8bdfff;
+
+            font-size: 14px;
+
+            line-height: 1.5;
+
+        }
+
+
+        .side-bottom .drop {
+
+            font-size: 45px;
+
+            margin-top: 8px;
+
+        }
+
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .main {
+
+            margin-left: 205px;
+
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .header {
+
+            min-height: 112px;
+
+            padding: 18px 30px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #064b9d,
+                    #0877cf,
+                    #06477f
+                );
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            border-bottom:
+                1px solid #1688dc;
+
+            position: relative;
+
+            overflow: hidden;
+
+        }
+
+
+        .header::after {
+
+            content: "";
+
+            position: absolute;
+
+            right: -100px;
+
+            bottom: -90px;
+
+            width: 550px;
+
+            height: 200px;
+
+            background:
+                rgba(255,255,255,0.08);
+
+            border-radius: 50%;
+
+        }
+
+
+        .brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+            z-index: 2;
+
+        }
+
+
+        .brand-icon {
+
+            font-size: 55px;
+
+        }
+
+
+        .brand h1 {
+
+            font-size: 37px;
+
+            font-weight: 800;
+
+        }
+
+
+        .brand h1 span {
+
+            color: #38ddff;
+
+        }
+
+
+        .brand p {
+
+            margin-top: 5px;
+
+            font-size: 17px;
+
+        }
+
+
+        .header-right {
+
+            display: flex;
+
+            gap: 15px;
+
+            z-index: 2;
+
+        }
+
+
+        .header-box {
+
+            min-width: 190px;
+
+            padding: 12px 17px;
+
+            border-radius: 16px;
+
+            background:
+                rgba(0,20,55,0.35);
+
+            border:
+                1px solid
+                rgba(0,220,255,0.6);
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+        }
+
+
+        .header-box-icon {
+
+            font-size: 27px;
+
+        }
+
+
+        .header-box strong {
+
+            color: #31efd7;
+
+        }
+
+
+        .header-box small {
+
+            display: block;
+
+            margin-top: 4px;
+
+        }
+
+
+        /* =====================================================
+           CONTENT
+        ===================================================== */
+
+        .content {
+
+            padding: 25px;
+
+        }
+
+
+        .section {
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .section-title {
+
+            font-size: 25px;
+
+            color: #45caff;
+
+            margin:
+                5px 0 15px 5px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+        }
+
+
+        /* =====================================================
+           CARDS
+        ===================================================== */
+
+        .cards-4 {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+
+        }
+
+
+        .card {
+
+            min-height: 150px;
+
+            border-radius: 17px;
+
+            padding: 20px;
+
+            position: relative;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 8px 25px
+                rgba(0,0,0,0.25);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.2);
+
+            transition: 0.3s;
+
+        }
+
+
+        .card:hover {
+
+            transform:
+                translateY(-4px);
+
+            box-shadow:
+                0 12px 35px
+                rgba(0,180,255,0.3);
+
+        }
+
+
+        .card::after {
+
+            content: "";
+
+            position: absolute;
+
+            width: 180px;
+
+            height: 180px;
+
+            right: -70px;
+
+            bottom: -100px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255,255,255,0.10);
+
+        }
+
+
+        /* COLORS */
+
+        .purple {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #6537ed,
+                    #4854ef
+                );
+
+        }
+
+
+        .orange {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff9d21,
+                    #ff6528
+                );
+
+        }
+
+
+        .pink {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f32d68,
+                    #ff477c
+                );
+
+        }
+
+
+        .cyan {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #08a9d1,
+                    #057abf
+                );
+
+        }
+
+
+        .blue {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #087de5,
+                    #1667d5
+                );
+
+        }
+
+
+        .green {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #159d58,
+                    #0b7d42
+                );
+
+        }
+
+
+        .darkblue {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #123f87,
+                    #082a61
+                );
+
+        }
+
+
+        .card-title {
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+        }
+
+
+        .card-icon {
+
+            width: 48px;
+
+            height: 48px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255,255,255,0.15);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.5);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 25px;
+
+        }
+
+
+        .value {
+
+            font-size: 32px;
+
+            font-weight: 800;
+
+            margin-top: 18px;
+
+        }
+
+
+        .unit {
+
+            font-size: 17px;
+
+            font-weight: normal;
+
+        }
+
+
+        .subtext {
+
+            margin-top: 7px;
+
+            color:
+                rgba(255,255,255,0.8);
+
+        }
+
+
+        /* =====================================================
+           ROAD CONDITION
+        ===================================================== */
+
+        .road-condition {
+
+            margin-top: 15px;
+
+        }
+
+
+        .condition {
+
+            display: inline-block;
+
+            padding: 9px 22px;
+
+            border-radius: 10px;
+
+            background: #18baf3;
+
+            font-size: 19px;
+
+            font-weight: bold;
+
+            box-shadow:
+                0 0 15px
+                rgba(0,220,255,0.5);
+
+        }
+
+
+        /* =====================================================
+           WATER
+        ===================================================== */
+
+        .water-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1.6fr 1fr 1fr;
+
+            gap: 15px;
+
+        }
+
+
+        .tank-card {
+
+            min-height: 160px;
+
+        }
+
+
+        .tank-content {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+        }
+
+
+        .tank-value {
+
+            font-size: 35px;
+
+            font-weight: bold;
+
+            margin-top: 15px;
+
+        }
+
+
+        .water-bar {
+
+            width: 240px;
+
+            height: 14px;
+
+            margin-top: 20px;
+
+            background:
+                rgba(0,0,0,0.25);
+
+            border-radius: 20px;
+
+            overflow: hidden;
+
+        }
+
+
+        .water-fill {
+
+            width: 0%;
+
+            height: 100%;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #8be9ff,
+                    #00d4ff
+                );
+
+            border-radius: 20px;
+
+            transition: width 0.5s;
+
+        }
+
+
+        .tank-emoji {
+
+            font-size: 75px;
+
+        }
+
+
+        .sprinkler-status {
+
+            margin-top: 17px;
+
+            display: inline-block;
+
+            padding: 8px 22px;
+
+            background: #20d66b;
+
+            border-radius: 13px;
+
+            font-size: 22px;
+
+            font-weight: bold;
+
+            box-shadow:
+                0 0 18px
+                rgba(0,255,100,0.4);
+
+        }
+
+
+        /* =====================================================
+           GPS
+        ===================================================== */
+
+        .gps-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                2fr 0.75fr 0.75fr;
+
+            gap: 15px;
+
+        }
+
+
+        .map-card {
+
+            min-height: 350px;
+
+            padding: 15px;
+
+        }
+
+
+        .map-title {
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            margin-bottom: 12px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+        }
+
+
+        #map {
+
+            height: 285px;
+
+            width: 100%;
+
+            border-radius: 14px;
+
+            border:
+                2px solid
+                rgba(255,255,255,0.4);
+
+        }
+
+
+        .gps-side {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 15px;
+
+        }
+
+
+        .gps-card {
+
+            flex: 1;
+
+            min-height: 100px;
+
+        }
+
+
+        .gps-number {
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+            margin-top: 10px;
+
+        }
+
+
+        /* =====================================================
+           LIVE STATUS
+        ===================================================== */
+
+        .live-card {
+
+            min-height: 350px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #1889d9,
+                    #174ec2
+                );
+
+        }
+
+
+        .truck {
+
+            text-align: center;
+
+            font-size: 80px;
+
+            margin: 15px 0;
+
+        }
+
+
+        .moving {
+
+            display: inline-block;
+
+            padding: 8px 20px;
+
+            background: white;
+
+            color: #173c91;
+
+            border-radius: 20px;
+
+            font-weight: bold;
+
+        }
+
+
+        .live-row {
+
+            padding: 10px 0;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,0.2);
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+        }
+
+
+        .live-row span:last-child {
+
+            font-weight: bold;
+
+            color: #4be9ff;
+
+        }
+
+
+        .green-text {
+
+            color: #39f28a !important;
+
+        }
+
+
+        /* =====================================================
+           EXTRA PAGES
+        ===================================================== */
+
+        .extra-page {
+
+            display: none;
+
+            padding: 25px;
+
+        }
+
+
+        .extra-title {
+
+            font-size: 27px;
+
+            color: #43d4ff;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .history-card,
+        .settings-card {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #103d70,
+                    #09294e
+                );
+
+            border:
+                1px solid #238bd1;
+
+            border-radius: 18px;
+
+            padding: 25px;
+
+            box-shadow:
+                0 8px 30px
+                rgba(0,0,0,0.3);
+
+        }
+
+
+        .history-card h3,
+        .settings-card h3 {
+
+            color: #45d7ff;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .history-row,
+        .setting-row {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            padding: 18px 5px;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,0.15);
+
+            font-size: 17px;
+
+        }
+
+
+        .history-row span:last-child {
+
+            color: #35e993;
+
+            font-weight: bold;
+
+        }
+
+
+        /* =====================================================
+           SETTINGS SWITCH
+        ===================================================== */
+
+        .switch {
+
+            position: relative;
+
+            width: 52px;
+
+            height: 28px;
+
+        }
+
+
+        .switch input {
+
+            display: none;
+
+        }
+
+
+        .slider {
+
+            position: absolute;
+
+            cursor: pointer;
+
+            inset: 0;
+
+            background: #45617c;
+
+            border-radius: 30px;
+
+            transition: 0.3s;
+
+        }
+
+
+        .slider:before {
+
+            content: "";
+
+            position: absolute;
+
+            height: 22px;
+
+            width: 22px;
+
+            left: 3px;
+
+            bottom: 3px;
+
+            background: white;
+
+            border-radius: 50%;
+
+            transition: 0.3s;
+
+        }
+
+
+        .switch input:checked
+        + .slider {
+
+            background: #12c96b;
+
+        }
+
+
+        .switch input:checked
+        + .slider:before {
+
+            transform:
+                translateX(24px);
+
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media(max-width:1200px) {
+
+            .cards-4 {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+
+            .water-grid {
+
+                grid-template-columns:
+                    1fr 1fr;
+
+            }
+
+
+            .gps-grid {
+
+                grid-template-columns:
+                    1fr 1fr;
+
+            }
+
+
+            .map-card {
+
+                grid-column:
+                    span 2;
+
+            }
+
+
+            .live-card {
+
+                grid-column:
+                    span 2;
+
+            }
+
+        }
+
+
+        @media(max-width:800px) {
+
+            .sidebar {
+
+                width: 70px;
+
+                padding:
+                    20px 8px;
+
+            }
+
+
+            .main {
+
+                margin-left: 70px;
+
+            }
+
+
+            .menu-item span:not(.menu-icon) {
+
+                display: none;
+
+            }
+
+
+            .side-bottom {
+
+                display: none;
+
+            }
+
+
+            .header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 15px;
+
+            }
+
+
+            .header-right {
+
+                flex-wrap: wrap;
+
+            }
+
+
+            .cards-4,
+            .water-grid,
+            .gps-grid {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .map-card,
+            .live-card {
+
+                grid-column:
+                    span 1;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
+
+<div class="sidebar">
+
+
+    <div class="side-logo">
+        🚛
+    </div>
+
+
+    <div class="menu">
+
+
+        <!-- DASHBOARD -->
+
+        <div
+            class="menu-item active"
+            onclick="showPage('dashboard', this)"
+        >
+
+            <span class="menu-icon">
+                ⌂
+            </span>
+
+            <span>
+                Dashboard
+            </span>
+
+        </div>
+
+
+        <!-- LIVE MAP -->
+
+        <div
+            class="menu-item"
+            onclick="showPage('map', this)"
+        >
+
+            <span class="menu-icon">
+                📍
+            </span>
+
+            <span>
+                Live Map
+            </span>
+
+        </div>
+
+
+        <!-- SENSOR DATA -->
+
+        <div
+            class="menu-item"
+            onclick="showPage('sensors', this)"
+        >
+
+            <span class="menu-icon">
+                📡
+            </span>
+
+            <span>
+                Sensor Data
+            </span>
+
+        </div>
+
+
+        <!-- HISTORY -->
+
+        <div
+            class="menu-item"
+            onclick="showPage('history', this)"
+        >
+
+            <span class="menu-icon">
+                ◷
+            </span>
+
+            <span>
+                History
+            </span>
+
+        </div>
+
+
+        <!-- SETTINGS -->
+
+        <div
+            class="menu-item"
+            onclick="showPage('settings', this)"
+        >
+
+            <span class="menu-icon">
+                ⚙
+            </span>
+
+            <span>
+                Settings
+            </span>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- SIDE MESSAGE -->
+
+    <div class="side-bottom">
+
+        <div style="font-size:35px;">
+            🌱
+        </div>
+
+        <p>
+            Saving Water<br>
+            for a Better<br>
+            Tomorrow
+        </p>
+
+        <div class="drop">
+            💧
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<div class="main">
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header class="header">
+
+
+    <div class="brand">
+
+
+        <div class="brand-icon">
+            💧
+        </div>
+
+
+        <div>
+
+            <h1>
+                Smart
+                <span>Water</span>
+                Tanker
+            </h1>
+
+            <p>
+                IoT-Based Smart Road Sprinkling System
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="header-right">
+
+
+        <!-- MQTT -->
+
+        <div class="header-box">
+
+            <div class="header-box-icon">
+                📶
+            </div>
+
+            <div>
+
+                <strong>
+                    MQTT Connected
+                </strong>
+
+                <small>
+                    Receiving ESP32 data
+                </small>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DATE -->
+
+        <div class="header-box">
+
+            <div class="header-box-icon">
+                📅
+            </div>
+
+            <div>
+
+                <strong id="currentDate">
+                    Loading...
+                </strong>
+
+                <small id="currentTime">
+                    Loading...
+                </small>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</header>
+
+
+
+<!-- =========================================================
+     NORMAL DASHBOARD CONTENT
+========================================================= -->
+
+<div class="content" id="dashboardContent">
+
+
+<!-- =========================================================
+     ROAD & ENVIRONMENT
+========================================================= -->
+
+<section
+    class="section"
+    id="sensorSection"
+>
+
+
+    <h2 class="section-title">
+        🌧️ Road & Environment
+    </h2>
+
+
+    <div class="cards-4">
+
+
+        <!-- ROAD CONDITION -->
+
+        <div class="card purple">
+
+
+            <div class="card-title">
+
+                <div class="card-icon">
+                    🌧️
+                </div>
+
+                <span>
+                    Road Condition
+                </span>
+
+            </div>
+
+
+            <div class="road-condition">
+
+                <div
+                    class="condition"
+                    id="roadCondition"
+                >
+                    UNKNOWN
+                </div>
+
+            </div>
+
+
+            <div class="subtext">
+                Raindrop Sensor
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ROAD TEMPERATURE -->
+
+        <div class="card orange">
+
+
+            <div class="card-title">
+
+                <div class="card-icon">
+                    🌡️
+                </div>
+
+                <span>
+                    Road Temperature
+                </span>
+
+            </div>
+
+
+            <div class="value">
+
+                <span id="roadTemp">
+                    0.00
+                </span>
+
+                <span class="unit">
+                    °C
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- AMBIENT TEMPERATURE -->
+
+        <div class="card pink">
+
+
+            <div class="card-title">
+
+                <div class="card-icon">
+                    🌡️
+                </div>
+
+                <span>
+                    Ambient Temperature
+                </span>
+
+            </div>
+
+
+            <div class="value">
+
+                <span id="ambientTemp">
+                    0.00
+                </span>
+
+                <span class="unit">
+                    °C
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- RAIN SENSOR -->
+
+        <div class="card cyan">
+
+
+            <div class="card-title">
+
+                <div class="card-icon">
+                    💧
+                </div>
+
+                <span>
+                    Rain Sensor
+                </span>
+
+            </div>
+
+
+            <div class="value">
+
+                <span id="rainSensor">
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="subtext">
+                Digital Output
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     WATER TANK & SPRINKLER
+========================================================= -->
+
+<section
+    class="section"
+    id="waterSection"
+>
+
+
+    <h2 class="section-title">
+        💧 Water Tank & Sprinkler
+    </h2>
+
+
+    <div class="water-grid">
+
+
+        <!-- TANK -->
+
+        <div class="card blue tank-card">
+
+
+            <div class="tank-content">
+
+
+                <div>
+
+
+                    <div class="card-title">
+
+                        <div class="card-icon">
+                            🚰
+                        </div>
+
+                        <span>
+                            Tank Level Distance
+                        </span>
+
+                    </div>
+
+
+                    <div class="tank-value">
+
+                        <span id="waterDistance">
+                            0.00
+                        </span>
+
+                        <span class="unit">
+                            cm
+                        </span>
+
+                    </div>
+
+
+                    <div class="water-bar">
+
+                        <div
+                            class="water-fill"
+                            id="waterFill"
+                        ></div>
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="tank-emoji">
+                    🛢️
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- SPRINKLER -->
+
+        <div class="card green">
+
+
+            <div class="card-title">
+
+                <div class="card-icon">
+                    📡
+                </div>
+
+                <span>
+                    Sprinkler
+                </span>
+
+            </div>
+
+
+            <div
+                class="sprinkler-status"
+                id="sprinkler"
+            >
+                UNKNOWN
+            </div>
+
+
+            <div class="subtext">
+                Temperature + Road Condition
+            </div>
+
+
+        </div>
+
+
+
+        <!-- SMART CONTROL -->
+
+        <div class="card darkblue">
+
+
+            <div
+                style="
+                    font-size:30px;
+                    margin-bottom:15px;
+                "
+            >
+                💧
+            </div>
+
+
+            <h3>
+                Smart Control
+            </h3>
+
+
+            <p
+                style="
+                    margin-top:7px;
+                    line-height:1.5;
+                    color:#d8eeff;
+                "
+            >
+                Less Water Wastage<br>
+                Greener Tomorrow
+            </p>
+
+
+            <div
+                style="
+                    font-size:42px;
+                    margin-top:12px;
+                "
+            >
+                🌱
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     GPS TRACKING
+========================================================= -->
+
+<section
+    class="section"
+    id="gpsSection"
+>
+
+
+    <h2 class="section-title">
+        📍 GPS Tracking
+    </h2>
+
+
+    <div class="gps-grid">
+
+
+        <!-- MAP -->
+
+        <div class="card darkblue map-card">
+
+
+            <div class="map-title">
+
+                📍 Tanker Live Location
+
+            </div>
+
+
+            <div id="map"></div>
+
+
+        </div>
+
+
+
+        <!-- GPS SIDE DATA -->
+
+        <div class="gps-side">
+
+
+            <!-- SATELLITES -->
+
+            <div class="card blue gps-card">
+
+
+                <div class="card-title">
+
+                    <div class="card-icon">
+                        🛰️
+                    </div>
+
+                    <span>
+                        Satellites
+                    </span>
+
+                </div>
+
+
+                <div class="gps-number">
+
+                    <span id="satellites">
+                        0
+                    </span>
+
+                </div>
+
+
+                <div class="subtext">
+                    satellites
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ALTITUDE -->
+
+            <div class="card purple gps-card">
+
+
+                <div class="card-title">
+
+                    <div class="card-icon">
+                        ⛰️
+                    </div>
+
+                    <span>
+                        Altitude
+                    </span>
+
+                </div>
+
+
+                <div class="gps-number">
+
+                    <span id="altitude">
+                        0.00
+                    </span>
+
+                </div>
+
+
+                <div class="subtext">
+                    meters
+                </div>
+
+
+            </div>
+
+
+
+            <!-- SPEED -->
+
+            <div class="card cyan gps-card">
+
+
+                <div class="card-title">
+
+                    <div class="card-icon">
+                        🏎️
+                    </div>
+
+                    <span>
+                        Speed
+                    </span>
+
+                </div>
+
+
+                <div class="gps-number">
+
+                    <span id="speed">
+                        0.00
+                    </span>
+
+                </div>
+
+
+                <div class="subtext">
+                    km/h
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- LIVE STATUS -->
+
+        <div class="card live-card">
+
+
+            <div
+                style="
+                    text-align:center;
+                    margin-bottom:10px;
+                "
+            >
+
+                <div class="moving">
+                    📍 Tanker is moving
+                </div>
+
+            </div>
+
+
+            <div class="truck">
+                🚛
+            </div>
+
+
+            <div class="live-row">
+
+                <span>
+                    🌧️ Road Condition
+                </span>
+
+                <span id="liveRoad">
+                    UNKNOWN
+                </span>
+
+            </div>
+
+
+            <div class="live-row">
+
+                <span>
+                    📡 Sprinkler
+                </span>
+
+                <span
+                    id="liveSprinkler"
+                    class="green-text"
+                >
+                    UNKNOWN
+                </span>
+
+            </div>
+
+
+            <div class="live-row">
+
+                <span>
+                    🚰 Water Level
+                </span>
+
+                <span id="liveWater">
+                    0%
+                </span>
+
+            </div>
+
+
+            <div class="live-row">
+
+                <span>
+                    🏎️ Tanker Speed
+                </span>
+
+                <span>
+
+                    <span id="liveSpeed">
+                        0.00
+                    </span>
+
+                    km/h
+
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+</div>
+
+
+
+<!-- =========================================================
+     HISTORY PAGE
+========================================================= -->
+
+<div
+    id="historyPage"
+    class="extra-page"
+>
+
+    <h2 class="extra-title">
+        🕐 Tanker History
+    </h2>
+
+    <div class="history-card">
+
+        <h3>
+            Recent Tanker Activity
+        </h3>
+
+        <div class="history-row">
+            <span>
+                💧 Database Records
+            </span>
+
+            <span id="databaseCount">
+                0
+            </span>
+        </div>
+
+        <div style="overflow-x:auto; margin-top:15px;">
+
+            <table
+                class="history-table"
+                style="
+                    width:100%;
+                    border-collapse:collapse;
+                    min-width:900px;
+                "
+            >
+
+                <thead>
+
+                    <tr
+                        style="
+                            background:rgba(0,180,255,0.18);
+                        "
+                    >
+
+                        <th style="padding:12px; text-align:left;">
+                            Time
+                        </th>
+
+                        <th style="padding:12px; text-align:left;">
+                            Road
+                        </th>
+
+                        <th style="padding:12px; text-align:left;">
+                            Road Temp
+                        </th>
+
+                        <th style="padding:12px; text-align:left;">
+                            Ambient Temp
+                        </th>
+
+                        <th style="padding:12px; text-align:left;">
+                            Tank Distance
+                        </th>
+
+                        <th style="padding:12px; text-align:left;">
+                            Latitude
+                        </th>
+
+                        <th style="padding:12px; text-align:left;">
+                            Longitude
+                        </th>
+
+                        <th style="padding:12px; text-align:left;">
+                            Satellites
+                        </th>
+
+                        <th style="padding:12px; text-align:left;">
+                            Speed
+                        </th>
+
+                        <th style="padding:12px; text-align:left;">
+                            Sprinkler
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="historyBody">
+
+                    <tr>
+
+                        <td
+                            colspan="10"
+                            style="
+                                padding:20px;
+                                text-align:center;
+                            "
+                        >
+                            Waiting for sensor history...
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SETTINGS PAGE
+========================================================= -->
+
+<div
+    id="settingsPage"
+    class="extra-page"
+>
+
+
+    <h2 class="extra-title">
+        ⚙️ Settings
+    </h2>
+
+
+    <div class="settings-card">
+
+
+        <h3>
+            Smart Water Tanker Settings
+        </h3>
+
+
+        <!-- AUTOMATIC SPRINKLER -->
+
+        <div class="setting-row">
+
+            <span>
+                🚿 Automatic Sprinkler
+            </span>
+
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    checked
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+
+        <!-- GPS -->
+
+        <div class="setting-row">
+
+            <span>
+                📍 GPS Tracking
+            </span>
+
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    checked
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+
+        <!-- WATER ALERT -->
+
+        <div class="setting-row">
+
+            <span>
+                💧 Water Wastage Alert
+            </span>
+
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    checked
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+
+        <!-- MQTT -->
+
+        <div class="setting-row">
+
+            <span>
+                📶 MQTT Monitoring
+            </span>
+
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    checked
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+</div>
+
+
+
+<!-- =========================================================
+     LEAFLET JS
+========================================================= -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+
+<script>
+
+
+/* =========================================================
+   MAP
+========================================================= */
+
+
+let map =
+    L.map("map").setView(
+        [12.9716, 77.5946],
+        13
+    );
+
+
+L.tileLayer(
+
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+    {
+
+        maxZoom: 19,
+
+        attribution:
+            "&copy; OpenStreetMap contributors"
+
+    }
+
+).addTo(map);
+
+
+
+let tankerMarker =
+    L.marker(
+        [12.9716, 77.5946]
+    ).addTo(map);
+
+
+
+tankerMarker.bindPopup(
+    "<b>🚛 Smart Water Tanker</b><br>Live Location"
+);
+
+
+
+let firstGPS = true;
+
+
+
+/* =========================================================
+   CLOCK
+========================================================= */
+
+
+function updateClock() {
+
+
+    const now =
+        new Date();
+
+
+    const date =
+        now.toLocaleDateString(
+
+            "en-IN",
+
+            {
+
+                day: "2-digit",
+
+                month: "short",
+
+                year: "numeric"
+
+            }
+
+        );
+
+
+    const time =
+        now.toLocaleTimeString(
+
+            "en-IN",
+
+            {
+
+                hour: "2-digit",
+
+                minute: "2-digit",
+
+                second: "2-digit"
+
+            }
+
+        );
+
+
+    document.getElementById(
+        "currentDate"
+    ).innerText = date;
+
+
+    document.getElementById(
+        "currentTime"
+    ).innerText = time;
+
+}
+
+
+setInterval(
+    updateClock,
+    1000
+);
+
+
+updateClock();
+
+
+
+/* =========================================================
+   UPDATE DASHBOARD FROM FLASK
+========================================================= */
+
+
+async function updateDashboard() {
+
+
+    try {
+
+
+        const response =
+            await fetch("/data");
+
+
+        const data =
+            await response.json();
+
+
+
+        /* =============================================
+           ROAD CONDITION
+        ============================================= */
+
+
+        const road =
+            data.road_condition ||
+            "UNKNOWN";
+
+
+        document.getElementById(
+            "roadCondition"
+        ).innerText = road;
+
+
+        document.getElementById(
+            "liveRoad"
+        ).innerText = road;
+
+
+
+        /* =============================================
+           ROAD TEMPERATURE
+        ============================================= */
+
+
+        document.getElementById(
+            "roadTemp"
+        ).innerText =
+
+            Number(
+                data.road_temperature || 0
+            ).toFixed(2);
+
+
+
+        /* =============================================
+           AMBIENT TEMPERATURE
+        ============================================= */
+
+
+        document.getElementById(
+            "ambientTemp"
+        ).innerText =
+
+            Number(
+                data.ambient_temperature || 0
+            ).toFixed(2);
+
+
+
+        /* =============================================
+           RAIN SENSOR
+        ============================================= */
+
+
+        document.getElementById(
+            "rainSensor"
+        ).innerText =
+
+            data.rain_sensor ?? 0;
+
+
+
+        /* =============================================
+           WATER DISTANCE
+        ============================================= */
+
+
+        const distance =
+
+            Number(
+                data.water_level_distance || 0
+            );
+
+
+        document.getElementById(
+            "waterDistance"
+        ).innerText =
+
+            distance.toFixed(2);
+
+
+
+        /* =============================================
+           WATER PERCENTAGE
+        ============================================= */
+
+        /*
+            Change this value according
+            to your actual tanker height.
+        */
+
+
+        const MAX_DISTANCE = 100;
+
+
+        let waterPercent =
+
+            100 -
+            (
+                distance /
+                MAX_DISTANCE *
+                100
+            );
+
+
+        waterPercent =
+
+            Math.max(
+
+                0,
+
+                Math.min(
+                    100,
+                    waterPercent
+                )
+
+            );
+
+
+        document.getElementById(
+            "waterFill"
+        ).style.width =
+
+            waterPercent + "%";
+
+
+        document.getElementById(
+            "liveWater"
+        ).innerText =
+
+            Math.round(
+                waterPercent
+            ) + "%";
+
+
+
+        /* =============================================
+           SPRINKLER
+        ============================================= */
+
+
+        const sprinkler =
+
+            data.sprinkler_decision ||
+            "UNKNOWN";
+
+
+        document.getElementById(
+            "sprinkler"
+        ).innerText = sprinkler;
+
+
+        document.getElementById(
+            "liveSprinkler"
+        ).innerText = sprinkler;
+
+
+
+        /* =============================================
+           SATELLITES
+        ============================================= */
+
+
+        document.getElementById(
+            "satellites"
+        ).innerText =
+
+            data.satellites || 0;
+
+
+
+        /* =============================================
+           ALTITUDE
+        ============================================= */
+
+
+        document.getElementById(
+            "altitude"
+        ).innerText =
+
+            Number(
+                data.altitude || 0
+            ).toFixed(2);
+
+
+
+        /* =============================================
+           SPEED
+        ============================================= */
+
+
+        const speed =
+
+            Number(
+                data.speed || 0
+            );
+
+
+        document.getElementById(
+            "speed"
+        ).innerText =
+
+            speed.toFixed(2);
+
+
+        document.getElementById(
+            "liveSpeed"
+        ).innerText =
+
+            speed.toFixed(2);
+
+
+
+        /* =============================================
+           GPS MAP
+        ============================================= */
+
+
+        const latitude =
+
+            Number(
+                data.latitude || 0
+            );
+
+
+        const longitude =
+
+            Number(
+                data.longitude || 0
+            );
+
+
+        if (
+
+            latitude !== 0 &&
+            longitude !== 0
+
+        ) {
+
+
+            /* MOVE TANKER MARKER */
+
+            tankerMarker.setLatLng(
+
+                [
+                    latitude,
+                    longitude
+                ]
+
+            );
+
+
+            /* FIRST GPS FIX */
+
+            if (firstGPS) {
+
+
+                map.setView(
+
+                    [
+                        latitude,
+                        longitude
+                    ],
+
+                    17
+
+                );
+
+
+                firstGPS = false;
+
+            }
+
+        }
+
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "Dashboard error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   UPDATE EVERY 2 SECONDS
+========================================================= */
+
+
+setInterval(
+
+    updateDashboard,
+
+    2000
+
+);
+
+
+updateDashboard();
+
+
+
+/* =========================================================
+   SIDEBAR NAVIGATION
+========================================================= */
+
+
+function showPage(
+    page,
+    element
+) {
+
+
+    /* REMOVE ACTIVE */
+
+    document
+        .querySelectorAll(
+            ".menu-item"
+        )
+        .forEach(
+
+            item => {
+
+                item.classList.remove(
+                    "active"
+                );
+
+            }
+
+        );
+
+
+
+    /* ADD ACTIVE */
+
+    element.classList.add(
+        "active"
+    );
+
+
+
+    /* =====================================================
+       DASHBOARD
+    ===================================================== */
+
+
+    if (
+        page === "dashboard"
+    ) {
+
+
+        document.getElementById(
+            "dashboardContent"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "historyPage"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "settingsPage"
+        ).style.display =
+            "none";
+
+
+        window.scrollTo({
+
+            top: 0,
+
+            behavior: "smooth"
+
+        });
+
+    }
+
+
+
+    /* =====================================================
+       LIVE MAP
+    ===================================================== */
+
+
+    else if (
+        page === "map"
+    ) {
+
+
+        document.getElementById(
+            "dashboardContent"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "historyPage"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "settingsPage"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "gpsSection"
+        ).scrollIntoView({
+
+            behavior: "smooth"
+
+        });
+
+
+        setTimeout(
+
+            function() {
+
+                map.invalidateSize();
+
+            },
+
+            500
+
+        );
+
+    }
+
+
+
+    /* =====================================================
+       SENSOR DATA
+    ===================================================== */
+
+
+    else if (
+        page === "sensors"
+    ) {
+
+
+        document.getElementById(
+            "dashboardContent"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "historyPage"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "settingsPage"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "sensorSection"
+        ).scrollIntoView({
+
+            behavior: "smooth"
+
+        });
+
+    }
+
+
+
+    /* =====================================================
+       HISTORY
+    ===================================================== */
+
+
+    else if (
+        page === "history"
+    ) {
+
+
+        document.getElementById(
+            "dashboardContent"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "historyPage"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "settingsPage"
+        ).style.display =
+            "none";
+
+
+        window.scrollTo({
+
+            top: 0,
+
+            behavior: "smooth"
+
+        });
+
+    }
+
+
+
+    /* =====================================================
+       SETTINGS
+    ===================================================== */
+
+
+    else if (
+        page === "settings"
+    ) {
+
+
+        document.getElementById(
+            "dashboardContent"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "historyPage"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "settingsPage"
+        ).style.display =
+            "block";
+
+
+        window.scrollTo({
+
+            top: 0,
+
+            behavior: "smooth"
+
+        });
+
+    }
+
+}
+
+
+
+
+/* =========================================================
+   SQLITE HISTORY
+   Reads historical sensor records from Flask /history
+========================================================= */
+
+async function loadHistory() {
+
+    try {
+
+        const response =
+            await fetch("/history");
+
+        const history =
+            await response.json();
+
+        const body =
+            document.getElementById("historyBody");
+
+        if (!body) {
+            return;
+        }
+
+        if (history.error) {
+
+            body.innerHTML = `
+                <tr>
+                    <td
+                        colspan="10"
+                        style="
+                            padding:20px;
+                            text-align:center;
+                        "
+                    >
+                        Database error: ${history.error}
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        if (history.length === 0) {
+
+            body.innerHTML = `
+                <tr>
+                    <td
+                        colspan="10"
+                        style="
+                            padding:20px;
+                            text-align:center;
+                        "
+                    >
+                        No sensor history available yet.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        body.innerHTML = "";
+
+
+        history.forEach(function(row) {
+
+            const tr =
+                document.createElement("tr");
+
+            tr.style.borderBottom =
+                "1px solid rgba(255,255,255,0.15)";
+
+
+            tr.innerHTML = `
+
+                <td style="padding:12px;">
+                    ${row.timestamp || "-"}
+                </td>
+
+                <td style="padding:12px;">
+                    ${row.road_condition || "-"}
+                </td>
+
+                <td style="padding:12px;">
+                    ${Number(
+                        row.road_temperature || 0
+                    ).toFixed(2)} °C
+                </td>
+
+                <td style="padding:12px;">
+                    ${Number(
+                        row.ambient_temperature || 0
+                    ).toFixed(2)} °C
+                </td>
+
+                <td style="padding:12px;">
+                    ${Number(
+                        row.water_level_distance || 0
+                    ).toFixed(2)} cm
+                </td>
+
+                <td style="padding:12px;">
+                    ${Number(
+                        row.latitude || 0
+                    ).toFixed(6)}
+                </td>
+
+                <td style="padding:12px;">
+                    ${Number(
+                        row.longitude || 0
+                    ).toFixed(6)}
+                </td>
+
+                <td style="padding:12px;">
+                    ${row.satellites || 0}
+                </td>
+
+                <td style="padding:12px;">
+                    ${Number(
+                        row.speed || 0
+                    ).toFixed(2)} km/h
+                </td>
+
+                <td style="padding:12px;">
+                    ${row.sprinkler_decision || "UNKNOWN"}
+                </td>
+
+            `;
+
+            body.appendChild(tr);
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "SQLite history error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SQLITE DATABASE RECORD COUNT
+========================================================= */
+
+async function loadDatabaseCount() {
+
+    try {
+
+        const response =
+            await fetch("/database_count");
+
+        const data =
+            await response.json();
+
+        const countElement =
+            document.getElementById("databaseCount");
+
+        if (countElement) {
+
+            countElement.innerText =
+                data.total_records ?? 0;
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "Database count error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   REFRESH SQLITE HISTORY
+========================================================= */
+
+setInterval(
+    loadHistory,
+    5000
+);
+
+setInterval(
+    loadDatabaseCount,
+    5000
+);
+
+loadHistory();
+loadDatabaseCount();
+
+</script>
+
+
+</body>
+
+</html>
