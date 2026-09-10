@@ -1,86 +1,91 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 import paho.mqtt.client as mqtt
 import json
 import sqlite3
 from datetime import datetime
 import os
 
-# ==========================================
+# =========================================================
 # FLASK APP
-# ==========================================
+# =========================================================
 
 app = Flask(__name__)
 
+# Allow Vercel frontend to access Render backend
+CORS(app)
 
-# ==========================================
+
+# =========================================================
 # MQTT SETTINGS
-# ==========================================
+# =========================================================
 
 BROKER = "broker.hivemq.com"
 PORT = 1883
+
 TOPIC = "smart_water_tanker/ruchitha"
+
+
+# =========================================================
+# DATABASE
+# =========================================================
 
 DATABASE = "smart_tanker.db"
 
 
-# ==========================================
-# LIVE SENSOR DATA
-# ==========================================
+# =========================================================
+# LATEST SENSOR DATA
+# =========================================================
 
-sensor_data = {
-    "road_condition": "UNKNOWN",
-    "rain_sensor": 0,
-    "road_temperature": 0.0,
-    "ambient_temperature": 0.0,
-    "water_level_distance": 0.0,
-    "latitude": 0.0,
-    "longitude": 0.0,
-    "satellites": 0,
-    "altitude": 0.0,
-    "speed": 0.0,
-    "sprinkler_decision": "UNKNOWN"
+latest_data = {
+    "water_level": 0,
+    "water_used": 0,
+    "flow_rate": 0,
+    "latitude": 0,
+    "longitude": 0,
+    "road_status": "UNKNOWN",
+    "sprinkler": "OFF",
+    "leakage": "NO",
+    "timestamp": ""
 }
 
 
-# ==========================================
-# CREATE DATABASE
-# ==========================================
+# =========================================================
+# INITIALIZE DATABASE
+# =========================================================
 
-def create_database():
+def init_db():
 
     conn = sqlite3.connect(DATABASE)
 
     cursor = conn.cursor()
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS sensor_readings (
+        CREATE TABLE IF NOT EXISTS sensor_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp TEXT,
-            road_condition TEXT,
-            rain_sensor INTEGER,
-            road_temperature REAL,
-            ambient_temperature REAL,
-            water_level_distance REAL,
+            water_level REAL,
+            water_used REAL,
+            flow_rate REAL,
             latitude REAL,
             longitude REAL,
-            satellites INTEGER,
-            altitude REAL,
-            speed REAL,
-            sprinkler_decision TEXT
+            road_status TEXT,
+            sprinkler TEXT,
+            leakage TEXT,
+            timestamp TEXT
         )
     """)
 
     conn.commit()
     conn.close()
 
-    print("SQLite database ready")
+    print("Database initialized")
 
 
-# ==========================================
-# SAVE SENSOR DATA TO DATABASE
-# ==========================================
+# =========================================================
+# SAVE SENSOR DATA
+# =========================================================
 
-def save_to_database(data):
+def save_data(data):
 
     try:
 
@@ -88,201 +93,127 @@ def save_to_database(data):
 
         cursor = conn.cursor()
 
-        timestamp = datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
-
         cursor.execute("""
-            INSERT INTO sensor_readings (
-                timestamp,
-                road_condition,
-                rain_sensor,
-                road_temperature,
-                ambient_temperature,
-                water_level_distance,
+            INSERT INTO sensor_data
+            (
+                water_level,
+                water_used,
+                flow_rate,
                 latitude,
                 longitude,
-                satellites,
-                altitude,
-                speed,
-                sprinkler_decision
+                road_status,
+                sprinkler,
+                leakage,
+                timestamp
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
 
-            timestamp,
+            data.get("water_level", 0),
+
+            data.get("water_used", 0),
+
+            data.get("flow_rate", 0),
+
+            data.get("latitude", 0),
+
+            data.get("longitude", 0),
+
+            data.get("road_status", "UNKNOWN"),
+
+            data.get("sprinkler", "OFF"),
+
+            data.get("leakage", "NO"),
 
             data.get(
-                "road_condition",
-                "UNKNOWN"
-            ),
-
-            data.get(
-                "rain_sensor",
-                0
-            ),
-
-            data.get(
-                "road_temperature",
-                0.0
-            ),
-
-            data.get(
-                "ambient_temperature",
-                0.0
-            ),
-
-            data.get(
-                "water_level_distance",
-                0.0
-            ),
-
-            data.get(
-                "latitude",
-                0.0
-            ),
-
-            data.get(
-                "longitude",
-                0.0
-            ),
-
-            data.get(
-                "satellites",
-                0
-            ),
-
-            data.get(
-                "altitude",
-                0.0
-            ),
-
-            data.get(
-                "speed",
-                0.0
-            ),
-
-            data.get(
-                "sprinkler_decision",
-                "UNKNOWN"
+                "timestamp",
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             )
         ))
 
         conn.commit()
-
         conn.close()
 
-        print("Data saved to SQLite")
+        print("Sensor data saved")
 
     except Exception as e:
 
-        print("SQLite error:", e)
+        print("Database error:", e)
 
 
-# ==========================================
+# =========================================================
 # MQTT CONNECT
-# ==========================================
+# =========================================================
 
-def on_connect(
-    client,
-    userdata,
-    flags,
-    reason_code,
-    properties
-):
+def on_connect(client, userdata, flags, rc):
 
-    print()
-    print("================================")
-    print("          FLASK MQTT")
-    print("================================")
+    if rc == 0:
 
-    print("Reason code:", reason_code)
+        print("Connected to HiveMQ MQTT broker")
 
-    if reason_code == 0:
+        client.subscribe(TOPIC)
 
-        print("CONNECTED TO HIVEMQ")
-
-        result, mid = client.subscribe(TOPIC)
-
-        print(
-            "Subscribe result:",
-            result
-        )
-
-        print("Subscribed topic:")
-        print(TOPIC)
-
-        print("Waiting for ESP32 data...")
+        print("Subscribed to:", TOPIC)
 
     else:
 
-        print("MQTT CONNECTION FAILED")
+        print("MQTT connection failed. Code:", rc)
 
 
-# ==========================================
-# MQTT MESSAGE RECEIVED
-# ==========================================
+# =========================================================
+# MQTT MESSAGE
+# =========================================================
 
-def on_message(
-    client,
-    userdata,
-    msg
-):
+def on_message(client, userdata, msg):
 
-    global sensor_data
-
-    print()
-    print("================================")
-    print("      ESP32 MESSAGE RECEIVED")
-    print("================================")
-
-    print("Topic:", msg.topic)
+    global latest_data
 
     try:
 
-        # Convert MQTT message to text
-        message = msg.payload.decode()
+        payload = msg.payload.decode()
 
-        print("Message:")
-        print(message)
+        print("----------------------------------")
+        print("MQTT MESSAGE RECEIVED")
+        print(payload)
+        print("----------------------------------")
 
-        # Convert JSON text to Python dictionary
-        data = json.loads(message)
+        data = json.loads(payload)
 
-        # Update live sensor data
-        sensor_data.update(data)
+        # Update latest values
+        latest_data.update(data)
 
-        print()
-        print("LIVE DATA:")
-        print(sensor_data)
+        # Add timestamp if ESP32 does not send one
+        if not latest_data.get("timestamp"):
+
+            latest_data["timestamp"] = datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
 
         # Save to SQLite
-        save_to_database(data)
+        save_data(latest_data)
+
+    except json.JSONDecodeError:
+
+        print("Invalid JSON received from ESP32")
 
     except Exception as e:
 
-        print("ERROR:", e)
+        print("MQTT message error:", e)
 
 
-# ==========================================
+# =========================================================
 # MQTT CLIENT
-# ==========================================
+# =========================================================
 
-mqtt_client = mqtt.Client(
-    mqtt.CallbackAPIVersion.VERSION2,
-    client_id="SmartWaterTankerFlask"
-)
+mqtt_client = mqtt.Client()
 
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 
 
-# ==========================================
-# CONNECT TO HIVEMQ
-# ==========================================
-
-print()
-print("Connecting to HiveMQ...")
+# =========================================================
+# CONNECT MQTT
+# =========================================================
 
 try:
 
@@ -292,50 +223,56 @@ try:
         60
     )
 
+    mqtt_client.loop_start()
+
+    print("MQTT client started")
+
 except Exception as e:
 
-    print("MQTT ERROR:", e)
+    print("MQTT connection error:", e)
 
 
-# ==========================================
-# START MQTT LOOP
-# ==========================================
-
-mqtt_client.loop_start()
-
-
-# ==========================================
-# FLASK ROUTES
-# ==========================================
+# =========================================================
+# HOME
+# =========================================================
 
 @app.route("/")
 def home():
 
-    return """
-    <h1>Smart Water Tanker Backend</h1>
-    <p>Flask server is running successfully.</p>
-    <p>MQTT connection is active.</p>
-    <p>Use /data to view live sensor data.</p>
-    <p>Use /history to view previous readings.</p>
-    """
+    return jsonify({
+        "project": "Smart Water Tanker",
+        "status": "Backend is running",
+        "mqtt": "HiveMQ",
+        "message": "Flask backend connected successfully"
+    })
 
 
-# ==========================================
-# LIVE DATA API
-# ==========================================
+# =========================================================
+# TEST
+# =========================================================
+
+@app.route("/test")
+def test():
+
+    return "Smart Water Tanker Flask Backend is working!"
+
+
+# =========================================================
+# LIVE DATA
+# =========================================================
 
 @app.route("/data")
-def data():
+def get_data():
 
-    return jsonify(sensor_data)
+    return jsonify(latest_data)
 
 
-# ==========================================
-# HISTORY API
-# ==========================================
+# =========================================================
+# HISTORY
+# =========================================================
 
 @app.route("/history")
-def history():
+def get_history():
 
     try:
 
@@ -347,30 +284,33 @@ def history():
 
         cursor.execute("""
             SELECT *
-            FROM sensor_readings
+            FROM sensor_data
             ORDER BY id DESC
-            LIMIT 20
+            LIMIT 50
         """)
 
         rows = cursor.fetchall()
 
         conn.close()
 
-        return jsonify([
-            dict(row)
-            for row in rows
-        ])
+        history = []
+
+        for row in rows:
+
+            history.append(dict(row))
+
+        return jsonify(history)
 
     except Exception as e:
 
         return jsonify({
             "error": str(e)
-        })
+        }), 500
 
 
-# ==========================================
-# DATABASE COUNT API
-# ==========================================
+# =========================================================
+# DATABASE COUNT
+# =========================================================
 
 @app.route("/database_count")
 def database_count():
@@ -381,58 +321,39 @@ def database_count():
 
         cursor = conn.cursor()
 
-        cursor.execute(
-            "SELECT COUNT(*) FROM sensor_readings"
-        )
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM sensor_data
+        """)
 
         count = cursor.fetchone()[0]
 
         conn.close()
 
         return jsonify({
-            "total_records": count
+            "count": count
         })
 
     except Exception as e:
 
         return jsonify({
             "error": str(e)
-        })
+        }), 500
 
 
-# ==========================================
-# START FLASK SERVER
-# ==========================================
+# =========================================================
+# DATABASE INITIALIZATION
+# =========================================================
+
+init_db()
+
+
+# =========================================================
+# RUN FLASK
+# =========================================================
 
 if __name__ == "__main__":
 
-    print()
-    print("================================")
-    print("       SMART WATER TANKER")
-    print("        FLASK SERVER")
-    print("================================")
-
-    print()
-    print("Dashboard:")
-    print("http://127.0.0.1:5000")
-
-    print()
-    print("Live Data:")
-    print("http://127.0.0.1:5000/data")
-
-    print()
-    print("History:")
-    print("http://127.0.0.1:5000/history")
-
-    print()
-    print("Database Count:")
-    print("http://127.0.0.1:5000/database_count")
-
-    # Create database before starting server
-    create_database()
-
-    # Render provides PORT automatically.
-    # Locally it will use port 5000.
     port = int(
         os.environ.get(
             "PORT",
@@ -443,6 +364,5 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=port,
-        debug=False,
-        use_reloader=False
+        debug=True
     )
