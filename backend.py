@@ -5,16 +5,14 @@ import json
 import sqlite3
 from datetime import datetime
 import os
+import time
 
 # =========================================================
 # FLASK APP
 # =========================================================
 
 app = Flask(__name__)
-
-# Allow Vercel frontend to access Render backend
 CORS(app)
-
 
 # =========================================================
 # MQTT SETTINGS
@@ -22,9 +20,7 @@ CORS(app)
 
 BROKER = "broker.hivemq.com"
 PORT = 1883
-
 TOPIC = "smart_water_tanker/ruchitha"
-
 
 # =========================================================
 # DATABASE
@@ -32,46 +28,53 @@ TOPIC = "smart_water_tanker/ruchitha"
 
 DATABASE = "smart_tanker.db"
 
-
 # =========================================================
-# LATEST SENSOR DATA
+# LATEST DATA
 # =========================================================
 
 latest_data = {
-    "water_level": 0,
-    "water_used": 0,
-    "flow_rate": 0,
+    "road_condition": "UNKNOWN",
+    "road_temperature": 0,
+    "ambient_temperature": 0,
+    "rain_sensor": 0,
+
+    "water_level_distance": 0,
+
     "latitude": 0,
     "longitude": 0,
-    "road_status": "UNKNOWN",
-    "sprinkler": "OFF",
-    "leakage": "NO",
+    "satellites": 0,
+    "altitude": 0,
+    "speed": 0,
+
+    "sprinkler_decision": "OFF",
+
     "timestamp": ""
 }
 
-
 # =========================================================
-# INITIALIZE DATABASE
+# DATABASE
 # =========================================================
 
 def init_db():
 
     conn = sqlite3.connect(DATABASE)
-
     cursor = conn.cursor()
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS sensor_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            water_level REAL,
-            water_used REAL,
-            flow_rate REAL,
+            timestamp TEXT,
+            road_condition TEXT,
+            road_temperature REAL,
+            ambient_temperature REAL,
+            rain_sensor INTEGER,
+            water_level_distance REAL,
             latitude REAL,
             longitude REAL,
-            road_status TEXT,
-            sprinkler TEXT,
-            leakage TEXT,
-            timestamp TEXT
+            satellites INTEGER,
+            altitude REAL,
+            speed REAL,
+            sprinkler_decision TEXT
         )
     """)
 
@@ -82,7 +85,7 @@ def init_db():
 
 
 # =========================================================
-# SAVE SENSOR DATA
+# SAVE DATA
 # =========================================================
 
 def save_data(data):
@@ -90,45 +93,49 @@ def save_data(data):
     try:
 
         conn = sqlite3.connect(DATABASE)
-
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO sensor_data
-            (
-                water_level,
-                water_used,
-                flow_rate,
+            INSERT INTO sensor_data (
+                timestamp,
+                road_condition,
+                road_temperature,
+                ambient_temperature,
+                rain_sensor,
+                water_level_distance,
                 latitude,
                 longitude,
-                road_status,
-                sprinkler,
-                leakage,
-                timestamp
+                satellites,
+                altitude,
+                speed,
+                sprinkler_decision
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
 
-            data.get("water_level", 0),
+            data.get("timestamp", ""),
 
-            data.get("water_used", 0),
+            data.get("road_condition", "UNKNOWN"),
 
-            data.get("flow_rate", 0),
+            data.get("road_temperature", 0),
+
+            data.get("ambient_temperature", 0),
+
+            data.get("rain_sensor", 0),
+
+            data.get("water_level_distance", 0),
 
             data.get("latitude", 0),
 
             data.get("longitude", 0),
 
-            data.get("road_status", "UNKNOWN"),
+            data.get("satellites", 0),
 
-            data.get("sprinkler", "OFF"),
+            data.get("altitude", 0),
 
-            data.get("leakage", "NO"),
+            data.get("speed", 0),
 
-            data.get(
-                "timestamp",
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            )
+            data.get("sprinkler_decision", "OFF")
         ))
 
         conn.commit()
@@ -145,19 +152,40 @@ def save_data(data):
 # MQTT CONNECT
 # =========================================================
 
-def on_connect(client, userdata, flags, rc):
+def on_connect(client, userdata, flags, reason_code, properties=None):
 
-    if rc == 0:
+    print("========================================")
 
-        print("Connected to HiveMQ MQTT broker")
+    print("MQTT CONNECTION CALLBACK")
 
-        client.subscribe(TOPIC)
+    print("Reason code:", reason_code)
+
+    if reason_code == 0:
+
+        print("CONNECTED TO HIVEMQ SUCCESSFULLY")
+
+        result = client.subscribe(TOPIC)
+
+        print("Subscribe result:", result)
 
         print("Subscribed to:", TOPIC)
 
     else:
 
-        print("MQTT connection failed. Code:", rc)
+        print("MQTT CONNECTION FAILED")
+        print("Reason:", reason_code)
+
+    print("========================================")
+
+
+# =========================================================
+# MQTT DISCONNECT
+# =========================================================
+
+def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None):
+
+    print("MQTT DISCONNECTED")
+    print("Reason:", reason_code)
 
 
 # =========================================================
@@ -172,64 +200,82 @@ def on_message(client, userdata, msg):
 
         payload = msg.payload.decode()
 
-        print("----------------------------------")
+        print("========================================")
         print("MQTT MESSAGE RECEIVED")
-        print(payload)
-        print("----------------------------------")
+        print("Topic:", msg.topic)
+        print("Payload:", payload)
+        print("========================================")
 
         data = json.loads(payload)
 
-        # Update latest values
+        # Update only received values
         latest_data.update(data)
 
-        # Add timestamp if ESP32 does not send one
-        if not latest_data.get("timestamp"):
+        # Add server timestamp
+        latest_data["timestamp"] = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
 
-            latest_data["timestamp"] = datetime.now().strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
-
-        # Save to SQLite
+        # Save data
         save_data(latest_data)
+
+        print("LATEST DATA UPDATED")
 
     except json.JSONDecodeError:
 
-        print("Invalid JSON received from ESP32")
+        print("Invalid JSON received")
 
     except Exception as e:
 
-        print("MQTT message error:", e)
+        print("MQTT processing error:", e)
 
 
 # =========================================================
 # MQTT CLIENT
 # =========================================================
 
-mqtt_client = mqtt.Client()
+mqtt_client = mqtt.Client(
+    mqtt.CallbackAPIVersion.VERSION2
+)
 
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
+mqtt_client.on_disconnect = on_disconnect
 
 
 # =========================================================
-# CONNECT MQTT
+# MQTT CONNECTION
 # =========================================================
 
-try:
+def start_mqtt():
 
-    mqtt_client.connect(
-        BROKER,
-        PORT,
-        60
-    )
+    while True:
 
-    mqtt_client.loop_start()
+        try:
 
-    print("MQTT client started")
+            print("Connecting to HiveMQ...")
+            print("Broker:", BROKER)
+            print("Port:", PORT)
+            print("Topic:", TOPIC)
 
-except Exception as e:
+            mqtt_client.connect(
+                BROKER,
+                PORT,
+                60
+            )
 
-    print("MQTT connection error:", e)
+            mqtt_client.loop_start()
+
+            print("MQTT client started")
+
+            break
+
+        except Exception as e:
+
+            print("MQTT connection error:", e)
+            print("Retrying MQTT connection in 10 seconds...")
+
+            time.sleep(10)
 
 
 # =========================================================
@@ -243,7 +289,7 @@ def home():
         "project": "Smart Water Tanker",
         "status": "Backend is running",
         "mqtt": "HiveMQ",
-        "message": "Flask backend connected successfully"
+        "topic": TOPIC
     })
 
 
@@ -277,13 +323,24 @@ def get_history():
     try:
 
         conn = sqlite3.connect(DATABASE)
-
         conn.row_factory = sqlite3.Row
 
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT *
+            SELECT
+                timestamp,
+                road_condition,
+                road_temperature,
+                ambient_temperature,
+                rain_sensor,
+                water_level_distance,
+                latitude,
+                longitude,
+                satellites,
+                altitude,
+                speed,
+                sprinkler_decision
             FROM sensor_data
             ORDER BY id DESC
             LIMIT 50
@@ -293,13 +350,7 @@ def get_history():
 
         conn.close()
 
-        history = []
-
-        for row in rows:
-
-            history.append(dict(row))
-
-        return jsonify(history)
+        return jsonify([dict(row) for row in rows])
 
     except Exception as e:
 
@@ -331,7 +382,7 @@ def database_count():
         conn.close()
 
         return jsonify({
-            "count": count
+            "total_records": count
         })
 
     except Exception as e:
@@ -342,14 +393,21 @@ def database_count():
 
 
 # =========================================================
-# DATABASE INITIALIZATION
+# INITIALIZE DATABASE
 # =========================================================
 
 init_db()
 
 
 # =========================================================
-# RUN FLASK
+# START MQTT
+# =========================================================
+
+start_mqtt()
+
+
+# =========================================================
+# RUN
 # =========================================================
 
 if __name__ == "__main__":
@@ -363,6 +421,5 @@ if __name__ == "__main__":
 
     app.run(
         host="0.0.0.0",
-        port=port,
-        debug=True
+        port=port
     )
