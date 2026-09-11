@@ -12,7 +12,10 @@ import time
 # =========================================================
 
 app = Flask(__name__)
+
+# Allow Vercel frontend to access Render backend
 CORS(app)
+
 
 # =========================================================
 # MQTT SETTINGS
@@ -20,7 +23,9 @@ CORS(app)
 
 BROKER = "broker.hivemq.com"
 PORT = 1883
+
 TOPIC = "smart_water_tanker/ruchitha"
+
 
 # =========================================================
 # DATABASE
@@ -28,8 +33,9 @@ TOPIC = "smart_water_tanker/ruchitha"
 
 DATABASE = "smart_tanker.db"
 
+
 # =========================================================
-# LATEST DATA
+# LATEST SENSOR DATA
 # =========================================================
 
 latest_data = {
@@ -51,13 +57,15 @@ latest_data = {
     "timestamp": ""
 }
 
+
 # =========================================================
-# DATABASE
+# INITIALIZE DATABASE
 # =========================================================
 
 def init_db():
 
     conn = sqlite3.connect(DATABASE)
+
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -85,7 +93,7 @@ def init_db():
 
 
 # =========================================================
-# SAVE DATA
+# SAVE SENSOR DATA
 # =========================================================
 
 def save_data(data):
@@ -93,6 +101,7 @@ def save_data(data):
     try:
 
         conn = sqlite3.connect(DATABASE)
+
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -155,9 +164,7 @@ def save_data(data):
 def on_connect(client, userdata, flags, reason_code, properties=None):
 
     print("========================================")
-
     print("MQTT CONNECTION CALLBACK")
-
     print("Reason code:", reason_code)
 
     if reason_code == 0:
@@ -167,7 +174,6 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
         result = client.subscribe(TOPIC)
 
         print("Subscribe result:", result)
-
         print("Subscribed to:", TOPIC)
 
     else:
@@ -182,14 +188,20 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
 # MQTT DISCONNECT
 # =========================================================
 
-def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None):
+def on_disconnect(
+    client,
+    userdata,
+    disconnect_flags,
+    reason_code,
+    properties=None
+):
 
     print("MQTT DISCONNECTED")
     print("Reason:", reason_code)
 
 
 # =========================================================
-# MQTT MESSAGE
+# MQTT MESSAGE RECEIVED
 # =========================================================
 
 def on_message(client, userdata, msg):
@@ -208,7 +220,7 @@ def on_message(client, userdata, msg):
 
         data = json.loads(payload)
 
-        # Update only received values
+        # Update latest sensor values
         latest_data.update(data)
 
         # Add server timestamp
@@ -216,14 +228,14 @@ def on_message(client, userdata, msg):
             "%Y-%m-%d %H:%M:%S"
         )
 
-        # Save data
+        # Save sensor data to database
         save_data(latest_data)
 
         print("LATEST DATA UPDATED")
 
     except json.JSONDecodeError:
 
-        print("Invalid JSON received")
+        print("Invalid JSON received from ESP32")
 
     except Exception as e:
 
@@ -244,7 +256,7 @@ mqtt_client.on_disconnect = on_disconnect
 
 
 # =========================================================
-# MQTT CONNECTION
+# START MQTT
 # =========================================================
 
 def start_mqtt():
@@ -310,7 +322,60 @@ def test():
 @app.route("/data")
 def get_data():
 
-    return jsonify(latest_data)
+    try:
+
+        # IMPORTANT:
+        # Read the latest value directly from SQLite database.
+        # This prevents /data from returning the initial zero values.
+
+        conn = sqlite3.connect(DATABASE)
+
+        conn.row_factory = sqlite3.Row
+
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT
+                timestamp,
+                road_condition,
+                road_temperature,
+                ambient_temperature,
+                rain_sensor,
+                water_level_distance,
+                latitude,
+                longitude,
+                satellites,
+                altitude,
+                speed,
+                sprinkler_decision
+            FROM sensor_data
+            ORDER BY id DESC
+            LIMIT 1
+        """)
+
+        row = cursor.fetchone()
+
+        conn.close()
+
+        # If database contains sensor data
+        if row:
+
+            print("Sending latest database data to dashboard")
+
+            return jsonify(dict(row))
+
+        # If database is empty, return default data
+        print("No database data available yet")
+
+        return jsonify(latest_data)
+
+    except Exception as e:
+
+        print("Data API error:", e)
+
+        return jsonify({
+            "error": str(e)
+        }), 500
 
 
 # =========================================================
@@ -323,6 +388,7 @@ def get_history():
     try:
 
         conn = sqlite3.connect(DATABASE)
+
         conn.row_factory = sqlite3.Row
 
         cursor = conn.cursor()
@@ -350,9 +416,17 @@ def get_history():
 
         conn.close()
 
-        return jsonify([dict(row) for row in rows])
+        history = []
+
+        for row in rows:
+
+            history.append(dict(row))
+
+        return jsonify(history)
 
     except Exception as e:
+
+        print("History error:", e)
 
         return jsonify({
             "error": str(e)
@@ -387,6 +461,8 @@ def database_count():
 
     except Exception as e:
 
+        print("Database count error:", e)
+
         return jsonify({
             "error": str(e)
         }), 500
@@ -407,7 +483,7 @@ start_mqtt()
 
 
 # =========================================================
-# RUN
+# RUN FLASK
 # =========================================================
 
 if __name__ == "__main__":
