@@ -3,1236 +3,864 @@
 
 <head>
 
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Smart Water Tanker</title>
-
-
-    <!-- LEAFLET MAP -->
-
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    >
-
-
-    <style>
-
-        /* =====================================================
-           GENERAL
-        ===================================================== */
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-
-        body {
-
-            background: #06182b;
-
-            color: white;
-
-            min-height: 100vh;
-
-        }
-
-
-        /* =====================================================
-           SIDEBAR
-        ===================================================== */
-
-        .sidebar {
-
-            position: fixed;
-
-            left: 0;
-            top: 0;
-
-            width: 205px;
-
-            height: 100vh;
-
-            background:
-                linear-gradient(
-                    180deg,
-                    #09284a,
-                    #06172d
-                );
-
-            border-right:
-                1px solid #1b5a91;
-
-            padding: 35px 12px;
-
-            z-index: 1000;
-
-        }
-
-
-        .side-logo {
-
-            text-align: center;
-
-            font-size: 50px;
-
-            margin-bottom: 35px;
-
-        }
-
-
-        .menu {
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 12px;
-
-        }
-
-
-        .menu-item {
-
-            padding: 15px 14px;
-
-            border-radius: 14px;
-
-            color: #c5ddff;
-
-            font-size: 17px;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 15px;
-
-            cursor: pointer;
-
-            transition: 0.3s;
-
-        }
-
-
-        .menu-item:hover {
-
-            background:
-                linear-gradient(
-                    90deg,
-                    #087ff5,
-                    #1554b8
-                );
-
-            color: white;
-
-            transform: translateX(3px);
-
-        }
-
-
-        .menu-item.active {
-
-            background:
-                linear-gradient(
-                    90deg,
-                    #078cff,
-                    #1856bd
-                );
-
-            color: white;
-
-            box-shadow:
-                0 5px 20px
-                rgba(0,150,255,0.35);
-
-        }
-
-
-        .menu-icon {
-
-            font-size: 25px;
-
-            width: 30px;
-
-            text-align: center;
-
-        }
-
-
-        .side-bottom {
-
-            position: absolute;
-
-            bottom: 25px;
-
-            left: 15px;
-
-            right: 15px;
-
-            text-align: center;
-
-            color: #8bdfff;
-
-            font-size: 14px;
-
-            line-height: 1.5;
-
-        }
-
-
-        .side-bottom .drop {
-
-            font-size: 45px;
-
-            margin-top: 8px;
-
-        }
-
-
-        /* =====================================================
-           MAIN
-        ===================================================== */
-
-        .main {
-
-            margin-left: 205px;
-
-        }
-
-
-        /* =====================================================
-           HEADER
-        ===================================================== */
-
-        .header {
-
-            min-height: 112px;
-
-            padding: 18px 30px;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    #064b9d,
-                    #0877cf,
-                    #06477f
-                );
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            border-bottom:
-                1px solid #1688dc;
-
-            position: relative;
-
-            overflow: hidden;
-
-        }
-
-
-        .header::after {
-
-            content: "";
-
-            position: absolute;
-
-            right: -100px;
-
-            bottom: -90px;
-
-            width: 550px;
-
-            height: 200px;
-
-            background:
-                rgba(255,255,255,0.08);
-
-            border-radius: 50%;
-
-        }
-
-
-        .brand {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 15px;
-
-            z-index: 2;
-
-        }
-
-
-        .brand-icon {
-
-            font-size: 55px;
-
-        }
-
-
-        .brand h1 {
-
-            font-size: 37px;
-
-            font-weight: 800;
-
-        }
-
-
-        .brand h1 span {
-
-            color: #38ddff;
-
-        }
-
-
-        .brand p {
-
-            margin-top: 5px;
-
-            font-size: 17px;
-
-        }
-
-
-        .header-right {
-
-            display: flex;
-
-            gap: 15px;
-
-            z-index: 2;
-
-        }
-
-
-        .header-box {
-
-            min-width: 190px;
-
-            padding: 12px 17px;
-
-            border-radius: 16px;
-
-            background:
-                rgba(0,20,55,0.35);
-
-            border:
-                1px solid
-                rgba(0,220,255,0.6);
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-        }
-
-
-        .header-box-icon {
-
-            font-size: 27px;
-
-        }
-
-
-        .header-box strong {
-
-            color: #31efd7;
-
-        }
-
-
-        .header-box small {
-
-            display: block;
-
-            margin-top: 4px;
-
-        }
-
-
-        /* =====================================================
-           CONTENT
-        ===================================================== */
-
-        .content {
-
-            padding: 25px;
-
-        }
-
-
-        .section {
-
-            margin-bottom: 25px;
-
-        }
-
-
-        .section-title {
-
-            font-size: 25px;
-
-            color: #45caff;
-
-            margin:
-                5px 0 15px 5px;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-        }
-
-
-        /* =====================================================
-           CARDS
-        ===================================================== */
-
-        .cards-4 {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(4, 1fr);
-
-            gap: 15px;
-
-        }
-
-
-        .card {
-
-            min-height: 150px;
-
-            border-radius: 17px;
-
-            padding: 20px;
-
-            position: relative;
-
-            overflow: hidden;
-
-            box-shadow:
-                0 8px 25px
-                rgba(0,0,0,0.25);
-
-            border:
-                1px solid
-                rgba(255,255,255,0.2);
-
-            transition: 0.3s;
-
-        }
-
-
-        .card:hover {
-
-            transform:
-                translateY(-4px);
-
-            box-shadow:
-                0 12px 35px
-                rgba(0,180,255,0.3);
-
-        }
-
-
-        .card::after {
-
-            content: "";
-
-            position: absolute;
-
-            width: 180px;
-
-            height: 180px;
-
-            right: -70px;
-
-            bottom: -100px;
-
-            border-radius: 50%;
-
-            background:
-                rgba(255,255,255,0.10);
-
-        }
-
-
-        /* COLORS */
-
-        .purple {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #6537ed,
-                    #4854ef
-                );
-
-        }
-
-
-        .orange {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #ff9d21,
-                    #ff6528
-                );
-
-        }
-
-
-        .pink {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #f32d68,
-                    #ff477c
-                );
-
-        }
-
-
-        .cyan {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #08a9d1,
-                    #057abf
-                );
-
-        }
-
-
-        .blue {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #087de5,
-                    #1667d5
-                );
-
-        }
-
-
-        .green {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #159d58,
-                    #0b7d42
-                );
-
-        }
-
-
-        .darkblue {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #123f87,
-                    #082a61
-                );
-
-        }
-
-
-        .card-title {
-
-            font-size: 18px;
-
-            font-weight: bold;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-        }
-
-
-        .card-icon {
-
-            width: 48px;
-
-            height: 48px;
-
-            border-radius: 50%;
-
-            background:
-                rgba(255,255,255,0.15);
-
-            border:
-                1px solid
-                rgba(255,255,255,0.5);
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size: 25px;
-
-        }
-
-
-        .value {
-
-            font-size: 32px;
-
-            font-weight: 800;
-
-            margin-top: 18px;
-
-        }
-
-
-        .unit {
-
-            font-size: 17px;
-
-            font-weight: normal;
-
-        }
-
-
-        .subtext {
-
-            margin-top: 7px;
-
-            color:
-                rgba(255,255,255,0.8);
-
-        }
-
-
-        /* =====================================================
-           ROAD CONDITION
-        ===================================================== */
-
-        .road-condition {
-
-            margin-top: 15px;
-
-        }
-
-
-        .condition {
-
-            display: inline-block;
-
-            padding: 9px 22px;
-
-            border-radius: 10px;
-
-            background: #18baf3;
-
-            font-size: 19px;
-
-            font-weight: bold;
-
-            box-shadow:
-                0 0 15px
-                rgba(0,220,255,0.5);
-
-        }
-
-
-        /* =====================================================
-           WATER
-        ===================================================== */
-
-        .water-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                1.6fr 1fr 1fr;
-
-            gap: 15px;
-
-        }
-
-
-        .tank-card {
-
-            min-height: 160px;
-
-        }
-
-
-        .tank-content {
-
-            display: flex;
-
-            justify-content:
-                space-between;
-
-            align-items: center;
-
-        }
-
-
-        .tank-value {
-
-            font-size: 35px;
-
-            font-weight: bold;
-
-            margin-top: 15px;
-
-        }
-
-
-        .water-bar {
-
-            width: 240px;
-
-            height: 14px;
-
-            margin-top: 20px;
-
-            background:
-                rgba(0,0,0,0.25);
-
-            border-radius: 20px;
-
-            overflow: hidden;
-
-        }
-
-
-        .water-fill {
-
-            width: 0%;
-
-            height: 100%;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    #8be9ff,
-                    #00d4ff
-                );
-
-            border-radius: 20px;
-
-            transition: width 0.5s;
-
-        }
-
-
-        .tank-emoji {
-
-            font-size: 75px;
-
-        }
-
-
-        .sprinkler-status {
-
-            margin-top: 17px;
-
-            display: inline-block;
-
-            padding: 8px 22px;
-
-            background: #20d66b;
-
-            border-radius: 13px;
-
-            font-size: 22px;
-
-            font-weight: bold;
-
-            box-shadow:
-                0 0 18px
-                rgba(0,255,100,0.4);
-
-        }
-
-
-        /* =====================================================
-           GPS
-        ===================================================== */
-
-        .gps-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                2fr 0.75fr 0.75fr;
-
-            gap: 15px;
-
-        }
-
-
-        .map-card {
-
-            min-height: 350px;
-
-            padding: 15px;
-
-        }
-
-
-        .map-title {
-
-            font-size: 18px;
-
-            font-weight: bold;
-
-            margin-bottom: 12px;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-        }
-
-
-        #map {
-
-            height: 285px;
-
-            width: 100%;
-
-            border-radius: 14px;
-
-            border:
-                2px solid
-                rgba(255,255,255,0.4);
-
-        }
-
-
-        .gps-side {
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 15px;
-
-        }
-
-
-        .gps-card {
-
-            flex: 1;
-
-            min-height: 100px;
-
-        }
-
-
-        .gps-number {
-
-            font-size: 28px;
-
-            font-weight: bold;
-
-            margin-top: 10px;
-
-        }
-
-
-        /* =====================================================
-           LIVE STATUS
-        ===================================================== */
-
-        .live-card {
-
-            min-height: 350px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    #1889d9,
-                    #174ec2
-                );
-
-        }
-
-
-        .truck {
-
-            text-align: center;
-
-            font-size: 80px;
-
-            margin: 15px 0;
-
-        }
-
-
-        .moving {
-
-            display: inline-block;
-
-            padding: 8px 20px;
-
-            background: white;
-
-            color: #173c91;
-
-            border-radius: 20px;
-
-            font-weight: bold;
-
-        }
-
-
-        .live-row {
-
-            padding: 10px 0;
-
-            border-bottom:
-                1px solid
-                rgba(255,255,255,0.2);
-
-            display: flex;
-
-            justify-content:
-                space-between;
-
-        }
-
-
-        .live-row span:last-child {
-
-            font-weight: bold;
-
-            color: #4be9ff;
-
-        }
-
-
-        .green-text {
-
-            color: #39f28a !important;
-
-        }
-
-
-        /* =====================================================
-           EXTRA PAGES
-        ===================================================== */
-
-        .extra-page {
-
-            display: none;
-
-            padding: 25px;
-
-        }
-
-
-        .extra-title {
-
-            font-size: 27px;
-
-            color: #43d4ff;
-
-            margin-bottom: 20px;
-
-        }
-
-
-        .history-card,
-        .settings-card {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #103d70,
-                    #09294e
-                );
-
-            border:
-                1px solid #238bd1;
-
-            border-radius: 18px;
-
-            padding: 25px;
-
-            box-shadow:
-                0 8px 30px
-                rgba(0,0,0,0.3);
-
-        }
-
-
-        .history-card h3,
-        .settings-card h3 {
-
-            color: #45d7ff;
-
-            margin-bottom: 20px;
-
-        }
-
-
-        .history-row,
-        .setting-row {
-
-            display: flex;
-
-            justify-content:
-                space-between;
-
-            align-items: center;
-
-            padding: 18px 5px;
-
-            border-bottom:
-                1px solid
-                rgba(255,255,255,0.15);
-
-            font-size: 17px;
-
-        }
-
-
-        .history-row span:last-child {
-
-            color: #35e993;
-
-            font-weight: bold;
-
-        }
-
-
-        /* =====================================================
-           SETTINGS SWITCH
-        ===================================================== */
-
-        .switch {
-
-            position: relative;
-
-            width: 52px;
-
-            height: 28px;
-
-        }
-
-
-        .switch input {
-
-            display: none;
-
-        }
-
-
-        .slider {
-
-            position: absolute;
-
-            cursor: pointer;
-
-            inset: 0;
-
-            background: #45617c;
-
-            border-radius: 30px;
-
-            transition: 0.3s;
-
-        }
-
-
-        .slider:before {
-
-            content: "";
-
-            position: absolute;
-
-            height: 22px;
-
-            width: 22px;
-
-            left: 3px;
-
-            bottom: 3px;
-
-            background: white;
-
-            border-radius: 50%;
-
-            transition: 0.3s;
-
-        }
-
-
-        .switch input:checked
-        + .slider {
-
-            background: #12c96b;
-
-        }
-
-
-        .switch input:checked
-        + .slider:before {
-
-            transform:
-                translateX(24px);
-
-        }
-
-
-        /* =====================================================
-           RESPONSIVE
-        ===================================================== */
-
-        @media(max-width:1200px) {
-
-            .cards-4 {
-
-                grid-template-columns:
-                    repeat(2, 1fr);
-
-            }
-
-
-            .water-grid {
-
-                grid-template-columns:
-                    1fr 1fr;
-
-            }
-
-
-            .gps-grid {
-
-                grid-template-columns:
-                    1fr 1fr;
-
-            }
-
-
-            .map-card {
-
-                grid-column:
-                    span 2;
-
-            }
-
-
-            .live-card {
-
-                grid-column:
-                    span 2;
-
-            }
-
-        }
-
-
-        @media(max-width:800px) {
-
-            .sidebar {
-
-                width: 70px;
-
-                padding:
-                    20px 8px;
-
-            }
-
-
-            .main {
-
-                margin-left: 70px;
-
-            }
-
-
-            .menu-item span:not(.menu-icon) {
-
-                display: none;
-
-            }
-
-
-            .side-bottom {
-
-                display: none;
-
-            }
-
-
-            .header {
-
-                flex-direction: column;
-
-                align-items: flex-start;
-
-                gap: 15px;
-
-            }
-
-
-            .header-right {
-
-                flex-wrap: wrap;
-
-            }
-
-
-            .cards-4,
-            .water-grid,
-            .gps-grid {
-
-                grid-template-columns:
-                    1fr;
-
-            }
-
-
-            .map-card,
-            .live-card {
-
-                grid-column:
-                    span 1;
-
-            }
-
-        }
-
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Smart Water Tanker</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+
+/* =========================================================
+   BASIC
+========================================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:
+        linear-gradient(
+            135deg,
+            #031a31,
+            #05294b,
+            #031a31
+        );
+    color:white;
+    min-height:100vh;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:205px;
+    height:100vh;
+    background:
+        linear-gradient(
+            180deg,
+            #062f61,
+            #04244a,
+            #02172f
+        );
+    border-right:1px solid #159ce8;
+    padding:35px 12px;
+    z-index:1000;
+}
+
+.side-logo{
+    text-align:center;
+    font-size:50px;
+    margin-bottom:35px;
+}
+
+.menu{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.menu-item{
+    padding:15px 14px;
+    border-radius:14px;
+    color:#cbe8ff;
+    font-size:17px;
+    display:flex;
+    align-items:center;
+    gap:15px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.menu-item:hover{
+    background:
+        linear-gradient(
+            90deg,
+            #078df2,
+            #1454bb
+        );
+    color:white;
+    transform:translateX(3px);
+}
+
+.menu-item.active{
+    background:
+        linear-gradient(
+            90deg,
+            #078df2,
+            #1755c2
+        );
+    color:white;
+    box-shadow:
+        0 5px 25px
+        rgba(0,160,255,0.45);
+}
+
+.menu-icon{
+    font-size:25px;
+    width:30px;
+    text-align:center;
+}
+
+.side-bottom{
+    position:absolute;
+    bottom:25px;
+    left:15px;
+    right:15px;
+    text-align:center;
+    color:#8beaff;
+    font-size:14px;
+    line-height:1.5;
+}
+
+.side-bottom .drop{
+    font-size:45px;
+    margin-top:8px;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.main{
+    margin-left:205px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header{
+    min-height:112px;
+    padding:18px 30px;
+    background:
+        linear-gradient(
+            90deg,
+            #064c9e,
+            #087bd1,
+            #07519a,
+            #063e7b
+        );
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:
+        1px solid #19b9f5;
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+        0 4px 25px
+        rgba(0,150,255,0.25);
+}
+
+.header::after{
+    content:"";
+    position:absolute;
+    right:-100px;
+    bottom:-90px;
+    width:550px;
+    height:200px;
+    background:
+        rgba(255,255,255,0.08);
+    border-radius:50%;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    z-index:2;
+}
+
+.brand-icon{
+    font-size:55px;
+}
+
+.brand h1{
+    font-size:37px;
+    font-weight:800;
+}
+
+.brand h1 span{
+    color:#35e3ff;
+}
+
+.brand p{
+    margin-top:5px;
+    font-size:17px;
+    color:#e8f8ff;
+}
+
+.header-right{
+    display:flex;
+    gap:15px;
+    z-index:2;
+}
+
+.header-box{
+    min-width:190px;
+    padding:12px 17px;
+    border-radius:16px;
+    background:
+        rgba(0,20,55,0.45);
+    border:
+        1px solid
+        rgba(0,225,255,0.7);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    box-shadow:
+        0 0 18px
+        rgba(0,210,255,0.15);
+}
+
+.header-box-icon{
+    font-size:27px;
+}
+
+.header-box strong{
+    color:#30f09d;
+}
+
+.header-box small{
+    display:block;
+    margin-top:4px;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.content{
+    padding:25px;
+}
+
+.section{
+    margin-bottom:25px;
+}
+
+.section-title{
+    font-size:25px;
+    color:#28ddff;
+    margin:
+        5px 0 15px 5px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-shadow:
+        0 0 12px
+        rgba(0,220,255,0.25);
+}
+
+
+/* =========================================================
+   FOUR CARDS
+========================================================= */
+
+.cards-4{
+    display:grid;
+    grid-template-columns:
+        repeat(4,1fr);
+    gap:15px;
+}
+
+.card{
+    min-height:150px;
+    border-radius:17px;
+    padding:20px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+        0 8px 25px
+        rgba(0,0,0,0.30);
+    border:
+        1px solid
+        rgba(255,255,255,0.22);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:
+        translateY(-4px);
+    box-shadow:
+        0 12px 35px
+        rgba(0,190,255,0.38);
+}
+
+.card::after{
+    content:"";
+    position:absolute;
+    width:180px;
+    height:180px;
+    right:-70px;
+    bottom:-100px;
+    border-radius:50%;
+    background:
+        rgba(255,255,255,0.10);
+}
+
+.purple{
+    background:
+        linear-gradient(
+            135deg,
+            #6937ef,
+            #5350eb,
+            #345bdc
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(90,50,255,0.30);
+}
+
+.orange{
+    background:
+        linear-gradient(
+            135deg,
+            #ffb31c,
+            #ff851b,
+            #ff6026
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(255,120,20,0.30);
+}
+
+.pink{
+    background:
+        linear-gradient(
+            135deg,
+            #f52e78,
+            #f52268,
+            #e91e63
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(245,30,100,0.30);
+}
+
+.cyan{
+    background:
+        linear-gradient(
+            135deg,
+            #0ac0e4,
+            #079ed0,
+            #0878bd
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(0,190,240,0.30);
+}
+
+.blue{
+    background:
+        linear-gradient(
+            135deg,
+            #078ef0,
+            #0878df,
+            #1558ce
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(0,125,240,0.30);
+}
+
+.green{
+    background:
+        linear-gradient(
+            135deg,
+            #18b960,
+            #0ca451,
+            #087c42
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(0,190,90,0.28);
+}
+
+.darkblue{
+    background:
+        linear-gradient(
+            135deg,
+            #124c9d,
+            #0b3d83,
+            #062c66
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(0,90,190,0.30);
+}
+
+
+/* =========================================================
+   CARD CONTENT
+========================================================= */
+
+.card-title{
+    font-size:18px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.card-icon{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:
+        rgba(255,255,255,0.15);
+    border:
+        1px solid
+        rgba(255,255,255,0.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:25px;
+}
+
+.value{
+    font-size:32px;
+    font-weight:800;
+    margin-top:18px;
+}
+
+.unit{
+    font-size:17px;
+    font-weight:normal;
+}
+
+.subtext{
+    margin-top:7px;
+    color:
+        rgba(255,255,255,0.85);
+}
+
+
+/* =========================================================
+   ROAD CONDITION
+========================================================= */
+
+.road-condition{
+    margin-top:15px;
+}
+
+.condition{
+    display:inline-block;
+    padding:9px 22px;
+    border-radius:10px;
+    background:
+        linear-gradient(
+            90deg,
+            #12c9ef,
+            #08b4eb
+        );
+    border:
+        1px solid
+        rgba(255,255,255,0.45);
+    font-size:19px;
+    font-weight:bold;
+    box-shadow:
+        0 0 18px
+        rgba(0,220,255,0.55);
+}
+
+
+/* =========================================================
+   WATER SECTION
+========================================================= */
+
+.water-grid{
+    display:grid;
+    grid-template-columns:
+        1.6fr 1fr 1fr;
+    gap:15px;
+}
+
+.tank-card{
+    min-height:160px;
+}
+
+.tank-content{
+    display:flex;
+    justify-content:
+        space-between;
+    align-items:center;
+}
+
+.tank-value{
+    font-size:35px;
+    font-weight:bold;
+    margin-top:15px;
+}
+
+.water-bar{
+    width:240px;
+    height:14px;
+    margin-top:20px;
+    background:
+        rgba(0,30,75,0.65);
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.water-fill{
+    width:0%;
+    height:100%;
+    background:
+        linear-gradient(
+            90deg,
+            #b4f5ff,
+            #25e0ff,
+            #00a9ee
+        );
+    border-radius:20px;
+    transition:width 0.5s;
+    box-shadow:
+        0 0 10px
+        rgba(0,220,255,0.6);
+}
+
+.tank-emoji{
+    font-size:75px;
+}
+
+.sprinkler-status{
+    margin-top:17px;
+    display:inline-block;
+    padding:8px 22px;
+    background:
+        linear-gradient(
+            90deg,
+            #24df6c,
+            #0ec857
+        );
+    border-radius:13px;
+    font-size:22px;
+    font-weight:bold;
+    box-shadow:
+        0 0 20px
+        rgba(0,255,100,0.5);
+}
+
+
+/* =========================================================
+   GPS SECTION
+========================================================= */
+
+.gps-grid{
+    display:grid;
+    grid-template-columns:
+        2fr 0.75fr 0.75fr;
+    gap:15px;
+}
+
+.map-card{
+    min-height:350px;
+    padding:15px;
+}
+
+.map-title{
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+#map{
+    height:285px;
+    width:100%;
+    border-radius:14px;
+    border:
+        2px solid
+        rgba(80,220,255,0.7);
+    box-shadow:
+        0 0 18px
+        rgba(0,180,255,0.2);
+}
+
+.gps-side{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.gps-card{
+    flex:1;
+    min-height:100px;
+}
+
+.gps-number{
+    font-size:28px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+
+/* =========================================================
+   LIVE STATUS
+========================================================= */
+
+.live-card{
+    min-height:350px;
+    background:
+        linear-gradient(
+            145deg,
+            #118fdc,
+            #155bc5,
+            #103f97
+        );
+    border:
+        1px solid
+        #19a9ed;
+}
+
+.truck{
+    text-align:center;
+    font-size:80px;
+    margin:15px 0;
+}
+
+.moving{
+    display:inline-block;
+    padding:8px 20px;
+    background:white;
+    color:#1452a0;
+    border-radius:20px;
+    font-weight:bold;
+    box-shadow:
+        0 0 15px
+        rgba(255,255,255,0.2);
+}
+
+.live-row{
+    padding:10px 0;
+    border-bottom:
+        1px solid
+        rgba(255,255,255,0.2);
+    display:flex;
+    justify-content:
+        space-between;
+}
+
+.live-row span:last-child{
+    font-weight:bold;
+    color:#40ebff;
+}
+
+.green-text{
+    color:#39f28a !important;
+}
+
+
+/* =========================================================
+   EXTRA PAGES
+========================================================= */
+
+.extra-page{
+    display:none;
+    padding:25px;
+}
+
+.extra-title{
+    font-size:27px;
+    color:#43ddff;
+    margin-bottom:20px;
+}
+
+.history-card,
+.settings-card{
+    background:
+        linear-gradient(
+            135deg,
+            #103f78,
+            #092b55
+        );
+    border:
+        1px solid #168ed8;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:
+        0 8px 30px
+        rgba(0,0,0,0.3);
+}
+
+.history-card h3,
+.settings-card h3{
+    color:#42dcff;
+    margin-bottom:20px;
+}
+
+.history-row,
+.setting-row{
+    display:flex;
+    justify-content:
+        space-between;
+    align-items:center;
+    padding:18px 5px;
+    border-bottom:
+        1px solid
+        rgba(255,255,255,0.15);
+    font-size:17px;
+}
+
+.history-row span:last-child{
+    color:#35ed93;
+    font-weight:bold;
+}
+
+
+/* =========================================================
+   SETTINGS SWITCH
+========================================================= */
+
+.switch{
+    position:relative;
+    width:52px;
+    height:28px;
+}
+
+.switch input{
+    display:none;
+}
+
+.slider{
+    position:absolute;
+    cursor:pointer;
+    inset:0;
+    background:#45617c;
+    border-radius:30px;
+    transition:0.3s;
+}
+
+.slider:before{
+    content:"";
+    position:absolute;
+    height:22px;
+    width:22px;
+    left:3px;
+    bottom:3px;
+    background:white;
+    border-radius:50%;
+    transition:0.3s;
+}
+
+.switch input:checked + .slider{
+    background:
+        linear-gradient(
+            90deg,
+            #10c96b,
+            #2be878
+        );
+}
+
+.switch input:checked + .slider:before{
+    transform:
+        translateX(24px);
+}
+
+
+/* =========================================================
+   CONNECTION STATUS
+========================================================= */
+
+#connectionStatus{
+    transition:0.3s;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1200px){
+
+    .cards-4{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .water-grid{
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .gps-grid{
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .map-card{
+        grid-column:
+            span 2;
+    }
+
+    .live-card{
+        grid-column:
+            span 2;
+    }
+}
+
+@media(max-width:800px){
+
+    .sidebar{
+        width:70px;
+        padding:
+            20px 8px;
+    }
+
+    .main{
+        margin-left:70px;
+    }
+
+    .menu-item span:not(.menu-icon){
+        display:none;
+    }
+
+    .side-bottom{
+        display:none;
+    }
+
+    .header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .header-right{
+        flex-wrap:wrap;
+    }
+
+    .cards-4,
+    .water-grid,
+    .gps-grid{
+        grid-template-columns:
+            1fr;
+    }
+
+    .map-card,
+    .live-card{
+        grid-column:
+            span 1;
+    }
+}
+
+</style>
 
 </head>
 
@@ -1246,109 +874,53 @@
 
 <div class="sidebar">
 
-
     <div class="side-logo">
         🚛
     </div>
 
-
     <div class="menu">
-
-
-        <!-- DASHBOARD -->
 
         <div
             class="menu-item active"
-            onclick="showPage('dashboard', this)"
+            onclick="showPage('dashboard',this)"
         >
-
-            <span class="menu-icon">
-                ⌂
-            </span>
-
-            <span>
-                Dashboard
-            </span>
-
+            <span class="menu-icon">⌂</span>
+            <span>Dashboard</span>
         </div>
-
-
-        <!-- LIVE MAP -->
 
         <div
             class="menu-item"
-            onclick="showPage('map', this)"
+            onclick="showPage('map',this)"
         >
-
-            <span class="menu-icon">
-                📍
-            </span>
-
-            <span>
-                Live Map
-            </span>
-
+            <span class="menu-icon">📍</span>
+            <span>Live Map</span>
         </div>
-
-
-        <!-- SENSOR DATA -->
 
         <div
             class="menu-item"
-            onclick="showPage('sensors', this)"
+            onclick="showPage('sensors',this)"
         >
-
-            <span class="menu-icon">
-                📡
-            </span>
-
-            <span>
-                Sensor Data
-            </span>
-
+            <span class="menu-icon">📡</span>
+            <span>Sensor Data</span>
         </div>
-
-
-        <!-- HISTORY -->
 
         <div
             class="menu-item"
-            onclick="showPage('history', this)"
+            onclick="showPage('history',this)"
         >
-
-            <span class="menu-icon">
-                ◷
-            </span>
-
-            <span>
-                History
-            </span>
-
+            <span class="menu-icon">◷</span>
+            <span>History</span>
         </div>
-
-
-        <!-- SETTINGS -->
 
         <div
             class="menu-item"
-            onclick="showPage('settings', this)"
+            onclick="showPage('settings',this)"
         >
-
-            <span class="menu-icon">
-                ⚙
-            </span>
-
-            <span>
-                Settings
-            </span>
-
+            <span class="menu-icon">⚙</span>
+            <span>Settings</span>
         </div>
-
 
     </div>
-
-
-    <!-- SIDE MESSAGE -->
 
     <div class="side-bottom">
 
@@ -1368,9 +940,7 @@
 
     </div>
 
-
 </div>
-
 
 
 <!-- =========================================================
@@ -1386,14 +956,11 @@
 
 <header class="header">
 
-
     <div class="brand">
-
 
         <div class="brand-icon">
             💧
         </div>
-
 
         <div>
 
@@ -1409,15 +976,10 @@
 
         </div>
 
-
     </div>
 
 
-
     <div class="header-right">
-
-
-        <!-- MQTT -->
 
         <div class="header-box">
 
@@ -1427,21 +989,18 @@
 
             <div>
 
-                <strong>
-                    MQTT Connected
+                <strong id="connectionStatus">
+                    Connecting...
                 </strong>
 
-                <small>
-                    Receiving ESP32 data
+                <small id="connectionMessage">
+                    Connecting to Render backend
                 </small>
 
             </div>
 
         </div>
 
-
-
-        <!-- DATE -->
 
         <div class="header-box">
 
@@ -1463,19 +1022,19 @@
 
         </div>
 
-
     </div>
-
 
 </header>
 
 
-
 <!-- =========================================================
-     NORMAL DASHBOARD CONTENT
+     DASHBOARD CONTENT
 ========================================================= -->
 
-<div class="content" id="dashboardContent">
+<div
+    class="content"
+    id="dashboardContent"
+>
 
 
 <!-- =========================================================
@@ -1487,11 +1046,9 @@
     id="sensorSection"
 >
 
-
     <h2 class="section-title">
         🌧️ Road & Environment
     </h2>
-
 
     <div class="cards-4">
 
@@ -1499,7 +1056,6 @@
         <!-- ROAD CONDITION -->
 
         <div class="card purple">
-
 
             <div class="card-title">
 
@@ -1513,7 +1069,6 @@
 
             </div>
 
-
             <div class="road-condition">
 
                 <div
@@ -1525,20 +1080,16 @@
 
             </div>
 
-
             <div class="subtext">
                 Raindrop Sensor
             </div>
 
-
         </div>
-
 
 
         <!-- ROAD TEMPERATURE -->
 
         <div class="card orange">
-
 
             <div class="card-title">
 
@@ -1552,7 +1103,6 @@
 
             </div>
 
-
             <div class="value">
 
                 <span id="roadTemp">
@@ -1565,15 +1115,12 @@
 
             </div>
 
-
         </div>
-
 
 
         <!-- AMBIENT TEMPERATURE -->
 
         <div class="card pink">
-
 
             <div class="card-title">
 
@@ -1587,7 +1134,6 @@
 
             </div>
 
-
             <div class="value">
 
                 <span id="ambientTemp">
@@ -1600,15 +1146,12 @@
 
             </div>
 
-
         </div>
-
 
 
         <!-- RAIN SENSOR -->
 
         <div class="card cyan">
-
 
             <div class="card-title">
 
@@ -1622,7 +1165,6 @@
 
             </div>
 
-
             <div class="value">
 
                 <span id="rainSensor">
@@ -1631,20 +1173,15 @@
 
             </div>
 
-
             <div class="subtext">
                 Digital Output
             </div>
 
-
         </div>
-
 
     </div>
 
-
 </section>
-
 
 
 <!-- =========================================================
@@ -1656,11 +1193,9 @@
     id="waterSection"
 >
 
-
     <h2 class="section-title">
         💧 Water Tank & Sprinkler
     </h2>
-
 
     <div class="water-grid">
 
@@ -1669,12 +1204,9 @@
 
         <div class="card blue tank-card">
 
-
             <div class="tank-content">
 
-
                 <div>
-
 
                     <div class="card-title">
 
@@ -1688,7 +1220,6 @@
 
                     </div>
 
-
                     <div class="tank-value">
 
                         <span id="waterDistance">
@@ -1701,7 +1232,6 @@
 
                     </div>
 
-
                     <div class="water-bar">
 
                         <div
@@ -1711,26 +1241,20 @@
 
                     </div>
 
-
                 </div>
-
 
                 <div class="tank-emoji">
                     🛢️
                 </div>
 
-
             </div>
 
-
         </div>
-
 
 
         <!-- SPRINKLER -->
 
         <div class="card green">
-
 
             <div class="card-title">
 
@@ -1744,7 +1268,6 @@
 
             </div>
 
-
             <div
                 class="sprinkler-status"
                 id="sprinkler"
@@ -1752,20 +1275,16 @@
                 UNKNOWN
             </div>
 
-
             <div class="subtext">
                 Temperature + Road Condition
             </div>
 
-
         </div>
-
 
 
         <!-- SMART CONTROL -->
 
         <div class="card darkblue">
-
 
             <div
                 style="
@@ -1776,11 +1295,9 @@
                 💧
             </div>
 
-
             <h3>
                 Smart Control
             </h3>
-
 
             <p
                 style="
@@ -1793,7 +1310,6 @@
                 Greener Tomorrow
             </p>
 
-
             <div
                 style="
                     font-size:42px;
@@ -1803,15 +1319,11 @@
                 🌱
             </div>
 
-
         </div>
-
 
     </div>
 
-
 </section>
-
 
 
 <!-- =========================================================
@@ -1823,11 +1335,9 @@
     id="gpsSection"
 >
 
-
     <h2 class="section-title">
         📍 GPS Tracking
     </h2>
-
 
     <div class="gps-grid">
 
@@ -1836,22 +1346,87 @@
 
         <div class="card darkblue map-card">
 
-
             <div class="map-title">
-
                 📍 Tanker Live Location
+            </div>
 
+            <div
+                style="
+                    display:flex;
+                    gap:10px;
+                    flex-wrap:wrap;
+                    margin-bottom:12px;
+                "
+            >
+
+                <button
+                    onclick="startNewTrip()"
+                    style="
+                        border:none;
+                        padding:10px 16px;
+                        border-radius:10px;
+                        cursor:pointer;
+                        font-weight:bold;
+                        background:
+                        linear-gradient(
+                            90deg,
+                            #12c96b,
+                            #25e878
+                        );
+                        color:white;
+                        box-shadow:
+                        0 0 12px
+                        rgba(0,255,120,0.25);
+                    "
+                >
+                    🟢 START NEW TRIP
+                </button>
+
+
+                <button
+                    onclick="endCurrentTrip()"
+                    style="
+                        border:none;
+                        padding:10px 16px;
+                        border-radius:10px;
+                        cursor:pointer;
+                        font-weight:bold;
+                        background:
+                        linear-gradient(
+                            90deg,
+                            #ef4057,
+                            #d92f47
+                        );
+                        color:white;
+                        box-shadow:
+                        0 0 12px
+                        rgba(255,50,70,0.25);
+                    "
+                >
+                    🔴 END TRIP & SAVE
+                </button>
+
+            </div>
+
+
+            <div
+                id="tripStatus"
+                style="
+                    margin-bottom:10px;
+                    color:#8bdfff;
+                    font-weight:bold;
+                "
+            >
+                No active trip
             </div>
 
 
             <div id="map"></div>
 
-
         </div>
 
 
-
-        <!-- GPS SIDE DATA -->
+        <!-- GPS DATA -->
 
         <div class="gps-side">
 
@@ -1859,7 +1434,6 @@
             <!-- SATELLITES -->
 
             <div class="card blue gps-card">
-
 
                 <div class="card-title">
 
@@ -1873,7 +1447,6 @@
 
                 </div>
 
-
                 <div class="gps-number">
 
                     <span id="satellites">
@@ -1882,20 +1455,16 @@
 
                 </div>
 
-
                 <div class="subtext">
                     satellites
                 </div>
 
-
             </div>
-
 
 
             <!-- ALTITUDE -->
 
             <div class="card purple gps-card">
-
 
                 <div class="card-title">
 
@@ -1909,7 +1478,6 @@
 
                 </div>
 
-
                 <div class="gps-number">
 
                     <span id="altitude">
@@ -1918,20 +1486,16 @@
 
                 </div>
 
-
                 <div class="subtext">
                     meters
                 </div>
 
-
             </div>
-
 
 
             <!-- SPEED -->
 
             <div class="card cyan gps-card">
-
 
                 <div class="card-title">
 
@@ -1945,7 +1509,6 @@
 
                 </div>
 
-
                 <div class="gps-number">
 
                     <span id="speed">
@@ -1954,23 +1517,18 @@
 
                 </div>
 
-
                 <div class="subtext">
                     km/h
                 </div>
 
-
             </div>
 
-
         </div>
-
 
 
         <!-- LIVE STATUS -->
 
         <div class="card live-card">
-
 
             <div
                 style="
@@ -1979,17 +1537,15 @@
                 "
             >
 
-                <div class="moving">
-                    📍 Tanker is moving
+                <div class="moving" id="movingStatus">
+                    📍 Waiting for GPS
                 </div>
 
             </div>
 
-
             <div class="truck">
                 🚛
             </div>
-
 
             <div class="live-row">
 
@@ -2002,7 +1558,6 @@
                 </span>
 
             </div>
-
 
             <div class="live-row">
 
@@ -2019,7 +1574,6 @@
 
             </div>
 
-
             <div class="live-row">
 
                 <span>
@@ -2031,7 +1585,6 @@
                 </span>
 
             </div>
-
 
             <div class="live-row">
 
@@ -2051,18 +1604,13 @@
 
             </div>
 
-
         </div>
-
 
     </div>
 
-
 </section>
 
-
 </div>
-
 
 
 <!-- =========================================================
@@ -2081,103 +1629,8 @@
     <div class="history-card">
 
         <h3>
-            Recent Tanker Activity
+            Saved Tanker Trips
         </h3>
-
-        <div class="history-row">
-            <span>
-                💧 Database Records
-            </span>
-
-            <span id="databaseCount">
-                0
-            </span>
-        </div>
-
-        <div style="overflow-x:auto; margin-top:15px;">
-
-            <table
-                class="history-table"
-                style="
-                    width:100%;
-                    border-collapse:collapse;
-                    min-width:900px;
-                "
-            >
-
-                <thead>
-
-                    <tr
-                        style="
-                            background:rgba(0,180,255,0.18);
-                        "
-                    >
-
-                        <th style="padding:12px; text-align:left;">
-                            Time
-                        </th>
-
-                        <th style="padding:12px; text-align:left;">
-                            Road
-                        </th>
-
-                        <th style="padding:12px; text-align:left;">
-                            Road Temp
-                        </th>
-
-                        <th style="padding:12px; text-align:left;">
-                            Ambient Temp
-                        </th>
-
-                        <th style="padding:12px; text-align:left;">
-                            Tank Distance
-                        </th>
-
-                        <th style="padding:12px; text-align:left;">
-                            Latitude
-                        </th>
-
-                        <th style="padding:12px; text-align:left;">
-                            Longitude
-                        </th>
-
-                        <th style="padding:12px; text-align:left;">
-                            Satellites
-                        </th>
-
-                        <th style="padding:12px; text-align:left;">
-                            Speed
-                        </th>
-
-                        <th style="padding:12px; text-align:left;">
-                            Sprinkler
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody id="historyBody">
-
-                    <tr>
-
-                        <td
-                            colspan="10"
-                            style="
-                                padding:20px;
-                                text-align:center;
-                            "
-                        >
-                            Waiting for sensor history...
-                        </td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
 
     </div>
 
@@ -2193,21 +1646,15 @@
     class="extra-page"
 >
 
-
     <h2 class="extra-title">
         ⚙️ Settings
     </h2>
 
-
     <div class="settings-card">
-
 
         <h3>
             Smart Water Tanker Settings
         </h3>
-
-
-        <!-- AUTOMATIC SPRINKLER -->
 
         <div class="setting-row">
 
@@ -2215,7 +1662,6 @@
                 🚿 Automatic Sprinkler
             </span>
 
-
             <label class="switch">
 
                 <input
@@ -2229,9 +1675,6 @@
 
         </div>
 
-
-
-        <!-- GPS -->
 
         <div class="setting-row">
 
@@ -2239,7 +1682,6 @@
                 📍 GPS Tracking
             </span>
 
-
             <label class="switch">
 
                 <input
@@ -2253,9 +1695,6 @@
 
         </div>
 
-
-
-        <!-- WATER ALERT -->
 
         <div class="setting-row">
 
@@ -2263,7 +1702,6 @@
                 💧 Water Wastage Alert
             </span>
 
-
             <label class="switch">
 
                 <input
@@ -2277,9 +1715,6 @@
 
         </div>
 
-
-
-        <!-- MQTT -->
 
         <div class="setting-row">
 
@@ -2287,7 +1722,6 @@
                 📶 MQTT Monitoring
             </span>
 
-
             <label class="switch">
 
                 <input
@@ -2301,64 +1735,63 @@
 
         </div>
 
-
     </div>
 
-
 </div>
 
 
 </div>
-
 
 
 <!-- =========================================================
-     LEAFLET JS
+     LEAFLET
 ========================================================= -->
 
 <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
 </script>
 
 
-
 <script>
+
+/* =========================================================
+   RENDER BACKEND
+========================================================= */
+
+/*
+   IMPORTANT:
+   Vercel dashboard -> Render Flask backend
+*/
+
+const BACKEND_URL =
+    "https://smart-water-tanker.onrender.com";
 
 
 /* =========================================================
    MAP
 ========================================================= */
 
-
 let map =
     L.map("map").setView(
-        [12.9716, 77.5946],
+        [12.9716,77.5946],
         13
     );
 
 
 L.tileLayer(
-
     "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-
     {
-
-        maxZoom: 19,
-
+        maxZoom:19,
         attribution:
-            "&copy; OpenStreetMap contributors"
-
+        "&copy; OpenStreetMap contributors"
     }
-
 ).addTo(map);
-
 
 
 let tankerMarker =
     L.marker(
-        [12.9716, 77.5946]
+        [12.9716,77.5946]
     ).addTo(map);
-
 
 
 tankerMarker.bindPopup(
@@ -2366,18 +1799,1012 @@ tankerMarker.bindPopup(
 );
 
 
+/* =========================================================
+   TRIP VARIABLES
+========================================================= */
 
-let firstGPS = true;
+let routePoints =
+    JSON.parse(
+        localStorage.getItem(
+            "currentTankerRoute"
+        ) || "[]"
+    );
 
+
+let routeLine = null;
+
+
+let tripStarted =
+    localStorage.getItem(
+        "tripStarted"
+    ) === "true";
+
+
+let tripStartTime =
+    localStorage.getItem(
+        "tripStartTime"
+    ) || null;
+
+
+let tripStartWater =
+    Number(
+        localStorage.getItem(
+            "tripStartWater"
+        ) || 0
+    );
+
+
+let savedTrips =
+    JSON.parse(
+        localStorage.getItem(
+            "tankerTripHistory"
+        ) || "[]"
+    );
+
+
+/* =========================================================
+   RESTORE ROUTE
+========================================================= */
+
+if(routePoints.length > 0){
+
+    routeLine =
+        L.polyline(
+            routePoints,
+            {
+                color:"#00d4ff",
+                weight:5,
+                opacity:0.9
+            }
+        ).addTo(map);
+
+
+    let last =
+        routePoints[
+            routePoints.length-1
+        ];
+
+
+    tankerMarker.setLatLng(last);
+
+    map.setView(
+        last,
+        17
+    );
+
+}
+
+
+/* =========================================================
+   TRIP STATUS
+========================================================= */
+
+function updateTripStatus(){
+
+    const box =
+        document.getElementById(
+            "tripStatus"
+        );
+
+
+    if(!box) return;
+
+
+    if(tripStarted){
+
+        box.innerText =
+            "🟢 Trip running • " +
+            routePoints.length +
+            " GPS points recorded";
+
+        box.style.color =
+            "#39f28a";
+
+    }
+    else{
+
+        box.innerText =
+            "No active trip";
+
+        box.style.color =
+            "#8bdfff";
+
+    }
+
+}
+
+
+/* =========================================================
+   START NEW TRIP
+========================================================= */
+
+function startNewTrip(){
+
+    if(
+        tripStarted &&
+        routePoints.length > 0
+    ){
+
+        saveCurrentTrip();
+
+    }
+
+
+    routePoints = [];
+
+
+    if(routeLine){
+
+        map.removeLayer(
+            routeLine
+        );
+
+        routeLine = null;
+
+    }
+
+
+    tripStarted = true;
+
+
+    tripStartTime =
+        new Date().toISOString();
+
+
+    tripStartWater =
+        Number(
+            document.getElementById(
+                "liveWater"
+            ).innerText
+            .replace("%","")
+        ) || 0;
+
+
+    localStorage.setItem(
+        "tripStarted",
+        "true"
+    );
+
+
+    localStorage.setItem(
+        "tripStartTime",
+        tripStartTime
+    );
+
+
+    localStorage.setItem(
+        "tripStartWater",
+        String(tripStartWater)
+    );
+
+
+    localStorage.setItem(
+        "currentTankerRoute",
+        "[]"
+    );
+
+
+    updateTripStatus();
+
+}
+
+
+/* =========================================================
+   END CURRENT TRIP
+========================================================= */
+
+function endCurrentTrip(){
+
+    if(!tripStarted){
+
+        alert(
+            "No active trip."
+        );
+
+        return;
+
+    }
+
+
+    if(routePoints.length === 0){
+
+        alert(
+            "Waiting for GPS location. Trip cannot be saved yet."
+        );
+
+        return;
+
+    }
+
+
+    saveCurrentTrip();
+
+
+    tripStarted = false;
+
+
+    localStorage.setItem(
+        "tripStarted",
+        "false"
+    );
+
+
+    localStorage.removeItem(
+        "tripStartTime"
+    );
+
+
+    localStorage.removeItem(
+        "tripStartWater"
+    );
+
+
+    localStorage.removeItem(
+        "currentTankerRoute"
+    );
+
+
+    routePoints = [];
+
+
+    if(routeLine){
+
+        map.removeLayer(
+            routeLine
+        );
+
+        routeLine = null;
+
+    }
+
+
+    updateTripStatus();
+
+    showTripHistory();
+
+
+    alert(
+        "Trip saved successfully in History."
+    );
+
+}
+
+
+/* =========================================================
+   SAVE CURRENT TRIP
+========================================================= */
+
+function saveCurrentTrip(){
+
+    if(
+        routePoints.length === 0
+    ){
+
+        return;
+
+    }
+
+
+    const start =
+        routePoints[0];
+
+
+    const end =
+        routePoints[
+            routePoints.length-1
+        ];
+
+
+    const currentWater =
+        Number(
+            document.getElementById(
+                "liveWater"
+            ).innerText
+            .replace("%","")
+        ) || 0;
+
+
+    const waterUsed =
+        Math.max(
+            0,
+            tripStartWater -
+            currentWater
+        );
+
+
+    const trip = {
+
+        id:Date.now(),
+
+        startTime:
+            tripStartTime ||
+            new Date().toISOString(),
+
+        endTime:
+            new Date().toISOString(),
+
+        startLocation:{
+            latitude:start[0],
+            longitude:start[1]
+        },
+
+        endLocation:{
+            latitude:end[0],
+            longitude:end[1]
+        },
+
+        route:[
+            ...routePoints
+        ],
+
+        distance:
+            calculateRouteDistance(
+                routePoints
+            ),
+
+        waterUsed:
+            waterUsed,
+
+        roadCondition:
+            document.getElementById(
+                "roadCondition"
+            ).innerText,
+
+        roadTemperature:
+            document.getElementById(
+                "roadTemp"
+            ).innerText,
+
+        sprinkler:
+            document.getElementById(
+                "sprinkler"
+            ).innerText
+
+    };
+
+
+    savedTrips.push(
+        trip
+    );
+
+
+    localStorage.setItem(
+        "tankerTripHistory",
+        JSON.stringify(
+            savedTrips
+        )
+    );
+
+}
+
+
+/* =========================================================
+   ROUTE DISTANCE
+========================================================= */
+
+function calculateRouteDistance(
+    points
+){
+
+    let total = 0;
+
+
+    for(
+        let i=1;
+        i<points.length;
+        i++
+    ){
+
+        total +=
+            calculateGPSDistance(
+
+                points[i-1][0],
+                points[i-1][1],
+
+                points[i][0],
+                points[i][1]
+
+            );
+
+    }
+
+
+    return total;
+
+}
+
+
+/* =========================================================
+   HAVERSINE DISTANCE
+========================================================= */
+
+function calculateGPSDistance(
+
+    lat1,
+    lon1,
+    lat2,
+    lon2
+
+){
+
+    const R = 6371;
+
+
+    const dLat =
+        (lat2-lat1)
+        * Math.PI/180;
+
+
+    const dLon =
+        (lon2-lon1)
+        * Math.PI/180;
+
+
+    const a =
+
+        Math.sin(
+            dLat/2
+        ) ** 2
+
+        +
+
+        Math.cos(
+            lat1*Math.PI/180
+        )
+
+        *
+
+        Math.cos(
+            lat2*Math.PI/180
+        )
+
+        *
+
+        Math.sin(
+            dLon/2
+        ) ** 2;
+
+
+    const c =
+        2 *
+        Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1-a)
+        );
+
+
+    return R*c;
+
+}
+
+
+/* =========================================================
+   ADD GPS POINT
+========================================================= */
+
+function addGPSPoint(
+    latitude,
+    longitude
+){
+
+    if(
+
+        !latitude ||
+        !longitude ||
+        latitude === 0 ||
+        longitude === 0
+
+    ){
+
+        return;
+
+    }
+
+
+    const point =
+        [
+            latitude,
+            longitude
+        ];
+
+
+    if(tripStarted){
+
+        if(
+            routePoints.length === 0
+        ){
+
+            routePoints.push(
+                point
+            );
+
+        }
+        else{
+
+            const last =
+                routePoints[
+                    routePoints.length-1
+                ];
+
+
+            const moved =
+                calculateGPSDistance(
+
+                    last[0],
+                    last[1],
+
+                    latitude,
+                    longitude
+
+                );
+
+
+            if(moved > 0.005){
+
+                routePoints.push(
+                    point
+                );
+
+            }
+
+        }
+
+
+        if(!routeLine){
+
+            routeLine =
+                L.polyline(
+                    routePoints,
+                    {
+
+                        color:"#00d4ff",
+
+                        weight:5,
+
+                        opacity:0.9
+
+                    }
+                ).addTo(map);
+
+        }
+        else{
+
+            routeLine.setLatLngs(
+                routePoints
+            );
+
+        }
+
+
+        localStorage.setItem(
+            "currentTankerRoute",
+            JSON.stringify(
+                routePoints
+            )
+        );
+
+    }
+
+
+    tankerMarker.setLatLng(
+        point
+    );
+
+
+    map.setView(
+        point,
+        17
+    );
+
+
+    updateTripStatus();
+
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function showTripHistory(){
+
+    const card =
+        document.querySelector(
+            "#historyPage .history-card"
+        );
+
+
+    if(!card) return;
+
+
+    if(savedTrips.length === 0){
+
+        card.innerHTML = `
+
+            <h3>
+                Saved Tanker Trips
+            </h3>
+
+            <div class="history-row">
+
+                <span>
+                    📋 Trip History
+                </span>
+
+                <span>
+                    No saved trips yet
+                </span>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    let html =
+        `<h3>Saved Tanker Trips</h3>`;
+
+
+    [...savedTrips]
+        .reverse()
+        .forEach(
+            (trip,index)=>{
+
+                const tripNumber =
+                    savedTrips.length-index;
+
+
+                const startDate =
+                    new Date(
+                        trip.startTime
+                    ).toLocaleString(
+                        "en-IN"
+                    );
+
+
+                const endDate =
+                    new Date(
+                        trip.endTime
+                    ).toLocaleString(
+                        "en-IN"
+                    );
+
+
+                html += `
+
+                    <div
+                        style="
+                            margin-top:15px;
+                            padding:18px;
+                            border:
+                            1px solid
+                            rgba(255,255,255,0.15);
+                            border-radius:14px;
+                            background:
+                            rgba(0,20,55,0.3);
+                        "
+                    >
+
+                        <h3
+                            style="
+                                margin-bottom:12px;
+                            "
+                        >
+                            🚛 Trip ${tripNumber}
+                        </h3>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                📅 Started
+                            </span>
+
+                            <span>
+                                ${startDate}
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                🏁 Ended
+                            </span>
+
+                            <span>
+                                ${endDate}
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                📏 Distance
+                            </span>
+
+                            <span>
+                                ${trip.distance.toFixed(2)}
+                                km
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                💧 Water Used
+                            </span>
+
+                            <span>
+                                ${trip.waterUsed.toFixed(1)}
+                                %
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                🌧️ Road Condition
+                            </span>
+
+                            <span>
+                                ${trip.roadCondition}
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                🌡️ Road Temperature
+                            </span>
+
+                            <span>
+                                ${trip.roadTemperature}
+                                °C
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                📡 Sprinkler
+                            </span>
+
+                            <span>
+                                ${trip.sprinkler}
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            style="
+                                margin-top:12px;
+                                color:#d5ecff;
+                            "
+                        >
+
+                            📍 Start:
+
+                            ${trip.startLocation.latitude.toFixed(5)},
+
+                            ${trip.startLocation.longitude.toFixed(5)}
+
+                            <br><br>
+
+                            🏁 End:
+
+                            ${trip.endLocation.latitude.toFixed(5)},
+
+                            ${trip.endLocation.longitude.toFixed(5)}
+
+                        </div>
+
+
+                        <button
+                            onclick="
+                            viewSavedTrip(${trip.id})
+                            "
+                            style="
+                                margin-top:14px;
+                                border:none;
+                                padding:9px 15px;
+                                border-radius:9px;
+                                cursor:pointer;
+                                font-weight:bold;
+                                background:
+                                linear-gradient(
+                                    90deg,
+                                    #078ef0,
+                                    #155bd0
+                                );
+                                color:white;
+                            "
+                        >
+
+                            🗺️ VIEW ROUTE
+
+                        </button>
+
+
+                        <button
+                            onclick="
+                            deleteSavedTrip(${trip.id})
+                            "
+                            style="
+                                margin-top:14px;
+                                margin-left:7px;
+                                border:none;
+                                padding:9px 15px;
+                                border-radius:9px;
+                                cursor:pointer;
+                                font-weight:bold;
+                                background:#e94b5f;
+                                color:white;
+                            "
+                        >
+
+                            🗑️ DELETE
+
+                        </button>
+
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+
+    card.innerHTML =
+        html;
+
+}
+
+
+/* =========================================================
+   VIEW OLD TRIP
+========================================================= */
+
+function viewSavedTrip(id){
+
+    const trip =
+        savedTrips.find(
+            item =>
+            item.id === id
+        );
+
+
+    if(!trip) return;
+
+
+    if(routeLine){
+
+        map.removeLayer(
+            routeLine
+        );
+
+    }
+
+
+    routeLine =
+        L.polyline(
+            trip.route,
+            {
+
+                color:"#ffd21f",
+
+                weight:6,
+
+                opacity:0.95
+
+            }
+        ).addTo(map);
+
+
+    map.fitBounds(
+        routeLine.getBounds()
+    );
+
+
+    L.marker(
+        trip.route[0]
+    )
+    .addTo(map)
+    .bindPopup(
+        "📍 Trip Start"
+    )
+    .openPopup();
+
+
+    L.marker(
+        trip.route[
+            trip.route.length-1
+        ]
+    )
+    .addTo(map)
+    .bindPopup(
+        "🏁 Trip End"
+    );
+
+
+    showPage(
+        "map",
+        document.querySelector(
+            ".menu-item:nth-child(2)"
+        )
+    );
+
+
+    setTimeout(
+        function(){
+
+            map.invalidateSize();
+
+        },
+        500
+    );
+
+}
+
+
+/* =========================================================
+   DELETE TRIP
+========================================================= */
+
+function deleteSavedTrip(id){
+
+    if(
+        !confirm(
+            "Delete this saved trip?"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    savedTrips =
+        savedTrips.filter(
+            trip =>
+            trip.id !== id
+        );
+
+
+    localStorage.setItem(
+        "tankerTripHistory",
+        JSON.stringify(
+            savedTrips
+        )
+    );
+
+
+    showTripHistory();
+
+}
 
 
 /* =========================================================
    CLOCK
 ========================================================= */
 
-
-function updateClock() {
-
+function updateClock(){
 
     const now =
         new Date();
@@ -2385,48 +2812,44 @@ function updateClock() {
 
     const date =
         now.toLocaleDateString(
-
             "en-IN",
-
             {
 
-                day: "2-digit",
+                day:"2-digit",
 
-                month: "short",
+                month:"short",
 
-                year: "numeric"
+                year:"numeric"
 
             }
-
         );
 
 
     const time =
         now.toLocaleTimeString(
-
             "en-IN",
-
             {
 
-                hour: "2-digit",
+                hour:"2-digit",
 
-                minute: "2-digit",
+                minute:"2-digit",
 
-                second: "2-digit"
+                second:"2-digit"
 
             }
-
         );
 
 
     document.getElementById(
         "currentDate"
-    ).innerText = date;
+    ).innerText =
+        date;
 
 
     document.getElementById(
         "currentTime"
-    ).innerText = time;
+    ).innerText =
+        time;
 
 }
 
@@ -2440,31 +2863,105 @@ setInterval(
 updateClock();
 
 
-
 /* =========================================================
-   UPDATE DASHBOARD FROM FLASK
+   CONNECTION STATUS
 ========================================================= */
 
+function setConnectionStatus(
+    connected
+){
 
-async function updateDashboard() {
+    const status =
+        document.getElementById(
+            "connectionStatus"
+        );
 
 
-    try {
+    const message =
+        document.getElementById(
+            "connectionMessage"
+        );
 
+
+    if(connected){
+
+        status.innerText =
+            "Backend Connected";
+
+        status.style.color =
+            "#30f09d";
+
+        message.innerText =
+            "Receiving ESP32 data";
+
+    }
+    else{
+
+        status.innerText =
+            "Backend Offline";
+
+        status.style.color =
+            "#ff6b6b";
+
+        message.innerText =
+            "Waiting for Render";
+
+    }
+
+}
+
+
+/* =========================================================
+   UPDATE DASHBOARD
+========================================================= */
+
+async function updateDashboard(){
+
+    try{
+
+        /*
+           Cache disabled so Vercel does not
+           display an old response.
+        */
 
         const response =
-            await fetch("/data");
+            await fetch(
+                BACKEND_URL +
+                "/data?t=" +
+                Date.now(),
+                {
+                    method:"GET",
+                    cache:"no-store"
+                }
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "Backend HTTP error: " +
+                response.status
+            );
+
+        }
 
 
         const data =
             await response.json();
 
 
+        console.log(
+            "LIVE DATA:",
+            data
+        );
 
-        /* =============================================
+
+        setConnectionStatus(true);
+
+
+        /* =================================================
            ROAD CONDITION
-        ============================================= */
-
+        ================================================= */
 
         const road =
             data.road_condition ||
@@ -2473,49 +2970,45 @@ async function updateDashboard() {
 
         document.getElementById(
             "roadCondition"
-        ).innerText = road;
+        ).innerText =
+            road;
 
 
         document.getElementById(
             "liveRoad"
-        ).innerText = road;
+        ).innerText =
+            road;
 
 
-
-        /* =============================================
+        /* =================================================
            ROAD TEMPERATURE
-        ============================================= */
-
+        ================================================= */
 
         document.getElementById(
             "roadTemp"
         ).innerText =
 
             Number(
-                data.road_temperature || 0
+                data.road_temperature ?? 0
             ).toFixed(2);
 
 
-
-        /* =============================================
+        /* =================================================
            AMBIENT TEMPERATURE
-        ============================================= */
-
+        ================================================= */
 
         document.getElementById(
             "ambientTemp"
         ).innerText =
 
             Number(
-                data.ambient_temperature || 0
+                data.ambient_temperature ?? 0
             ).toFixed(2);
 
 
-
-        /* =============================================
+        /* =================================================
            RAIN SENSOR
-        ============================================= */
-
+        ================================================= */
 
         document.getElementById(
             "rainSensor"
@@ -2524,16 +3017,13 @@ async function updateDashboard() {
             data.rain_sensor ?? 0;
 
 
-
-        /* =============================================
-           WATER DISTANCE
-        ============================================= */
-
+        /* =================================================
+           WATER LEVEL
+        ================================================= */
 
         const distance =
-
             Number(
-                data.water_level_distance || 0
+                data.water_level_distance ?? 0
             );
 
 
@@ -2544,16 +3034,14 @@ async function updateDashboard() {
             distance.toFixed(2);
 
 
-
-        /* =============================================
-           WATER PERCENTAGE
-        ============================================= */
-
         /*
-            Change this value according
-            to your actual tanker height.
-        */
+           IMPORTANT:
+           Change this number to your real
+           tanker tank height.
 
+           For now:
+           100 cm = completely empty distance.
+        */
 
         const MAX_DISTANCE = 100;
 
@@ -2571,14 +3059,11 @@ async function updateDashboard() {
         waterPercent =
 
             Math.max(
-
                 0,
-
                 Math.min(
                     100,
                     waterPercent
                 )
-
             );
 
 
@@ -2598,66 +3083,58 @@ async function updateDashboard() {
             ) + "%";
 
 
-
-        /* =============================================
+        /* =================================================
            SPRINKLER
-        ============================================= */
-
+        ================================================= */
 
         const sprinkler =
-
             data.sprinkler_decision ||
             "UNKNOWN";
 
 
         document.getElementById(
             "sprinkler"
-        ).innerText = sprinkler;
+        ).innerText =
+            sprinkler;
 
 
         document.getElementById(
             "liveSprinkler"
-        ).innerText = sprinkler;
+        ).innerText =
+            sprinkler;
 
 
-
-        /* =============================================
+        /* =================================================
            SATELLITES
-        ============================================= */
-
+        ================================================= */
 
         document.getElementById(
             "satellites"
         ).innerText =
 
-            data.satellites || 0;
+            data.satellites ?? 0;
 
 
-
-        /* =============================================
+        /* =================================================
            ALTITUDE
-        ============================================= */
-
+        ================================================= */
 
         document.getElementById(
             "altitude"
         ).innerText =
 
             Number(
-                data.altitude || 0
+                data.altitude ?? 0
             ).toFixed(2);
 
 
-
-        /* =============================================
+        /* =================================================
            SPEED
-        ============================================= */
-
+        ================================================= */
 
         const speed =
-
             Number(
-                data.speed || 0
+                data.speed ?? 0
             );
 
 
@@ -2675,122 +3152,105 @@ async function updateDashboard() {
             speed.toFixed(2);
 
 
+        /* =================================================
+           MOVING STATUS
+        ================================================= */
 
-        /* =============================================
-           GPS MAP
-        ============================================= */
+        const movingStatus =
+            document.getElementById(
+                "movingStatus"
+            );
 
+
+        if(speed > 0.5){
+
+            movingStatus.innerText =
+                "🚛 Tanker is moving";
+
+        }
+        else{
+
+            movingStatus.innerText =
+                "🅿️ Tanker is stationary";
+
+        }
+
+
+        /* =================================================
+           GPS
+        ================================================= */
 
         const latitude =
-
             Number(
-                data.latitude || 0
+                data.latitude ?? 0
             );
 
 
         const longitude =
-
             Number(
-                data.longitude || 0
+                data.longitude ?? 0
             );
 
 
-        if (
+        if(
 
             latitude !== 0 &&
             longitude !== 0
 
-        ) {
+        ){
 
-
-            /* MOVE TANKER MARKER */
-
-            tankerMarker.setLatLng(
-
-                [
-                    latitude,
-                    longitude
-                ]
-
+            addGPSPoint(
+                latitude,
+                longitude
             );
-
-
-            /* FIRST GPS FIX */
-
-            if (firstGPS) {
-
-
-                map.setView(
-
-                    [
-                        latitude,
-                        longitude
-                    ],
-
-                    17
-
-                );
-
-
-                firstGPS = false;
-
-            }
 
         }
 
 
     }
 
-    catch (error) {
+    catch(error){
 
-        console.log(
+        console.error(
             "Dashboard error:",
             error
         );
+
+
+        setConnectionStatus(false);
 
     }
 
 }
 
 
-
 /* =========================================================
    UPDATE EVERY 2 SECONDS
 ========================================================= */
 
-
 setInterval(
-
     updateDashboard,
-
     2000
-
 );
 
 
 updateDashboard();
 
 
-
 /* =========================================================
    SIDEBAR NAVIGATION
 ========================================================= */
 
-
 function showPage(
     page,
     element
-) {
-
-
-    /* REMOVE ACTIVE */
+){
 
     document
         .querySelectorAll(
             ".menu-item"
         )
         .forEach(
-
             item => {
 
                 item.classList.remove(
@@ -2798,28 +3258,21 @@ function showPage(
                 );
 
             }
-
         );
 
 
+    if(element){
 
-    /* ADD ACTIVE */
+        element.classList.add(
+            "active"
+        );
 
-    element.classList.add(
-        "active"
-    );
-
-
-
-    /* =====================================================
-       DASHBOARD
-    ===================================================== */
+    }
 
 
-    if (
-        page === "dashboard"
-    ) {
+    /* DASHBOARD */
 
+    if(page === "dashboard"){
 
         document.getElementById(
             "dashboardContent"
@@ -2841,25 +3294,18 @@ function showPage(
 
         window.scrollTo({
 
-            top: 0,
+            top:0,
 
-            behavior: "smooth"
+            behavior:"smooth"
 
         });
 
     }
 
 
+    /* LIVE MAP */
 
-    /* =====================================================
-       LIVE MAP
-    ===================================================== */
-
-
-    else if (
-        page === "map"
-    ) {
-
+    else if(page === "map"){
 
         document.getElementById(
             "dashboardContent"
@@ -2883,36 +3329,26 @@ function showPage(
             "gpsSection"
         ).scrollIntoView({
 
-            behavior: "smooth"
+            behavior:"smooth"
 
         });
 
 
         setTimeout(
-
-            function() {
+            function(){
 
                 map.invalidateSize();
 
             },
-
             500
-
         );
 
     }
 
 
+    /* SENSOR DATA */
 
-    /* =====================================================
-       SENSOR DATA
-    ===================================================== */
-
-
-    else if (
-        page === "sensors"
-    ) {
-
+    else if(page === "sensors"){
 
         document.getElementById(
             "dashboardContent"
@@ -2936,23 +3372,16 @@ function showPage(
             "sensorSection"
         ).scrollIntoView({
 
-            behavior: "smooth"
+            behavior:"smooth"
 
         });
 
     }
 
 
+    /* HISTORY */
 
-    /* =====================================================
-       HISTORY
-    ===================================================== */
-
-
-    else if (
-        page === "history"
-    ) {
-
+    else if(page === "history"){
 
         document.getElementById(
             "dashboardContent"
@@ -2972,27 +3401,23 @@ function showPage(
             "none";
 
 
+        showTripHistory();
+
+
         window.scrollTo({
 
-            top: 0,
+            top:0,
 
-            behavior: "smooth"
+            behavior:"smooth"
 
         });
 
     }
 
 
+    /* SETTINGS */
 
-    /* =====================================================
-       SETTINGS
-    ===================================================== */
-
-
-    else if (
-        page === "settings"
-    ) {
-
+    else if(page === "settings"){
 
         document.getElementById(
             "dashboardContent"
@@ -3014,224 +3439,26 @@ function showPage(
 
         window.scrollTo({
 
-            top: 0,
+            top:0,
 
-            behavior: "smooth"
-
-        });
-
-    }
-
-}
-
-
-
-
-/* =========================================================
-   SQLITE HISTORY
-   Reads historical sensor records from Flask /history
-========================================================= */
-
-async function loadHistory() {
-
-    try {
-
-        const response =
-            await fetch("/history");
-
-        const history =
-            await response.json();
-
-        const body =
-            document.getElementById("historyBody");
-
-        if (!body) {
-            return;
-        }
-
-        if (history.error) {
-
-            body.innerHTML = `
-                <tr>
-                    <td
-                        colspan="10"
-                        style="
-                            padding:20px;
-                            text-align:center;
-                        "
-                    >
-                        Database error: ${history.error}
-                    </td>
-                </tr>
-            `;
-
-            return;
-        }
-
-
-        if (history.length === 0) {
-
-            body.innerHTML = `
-                <tr>
-                    <td
-                        colspan="10"
-                        style="
-                            padding:20px;
-                            text-align:center;
-                        "
-                    >
-                        No sensor history available yet.
-                    </td>
-                </tr>
-            `;
-
-            return;
-        }
-
-
-        body.innerHTML = "";
-
-
-        history.forEach(function(row) {
-
-            const tr =
-                document.createElement("tr");
-
-            tr.style.borderBottom =
-                "1px solid rgba(255,255,255,0.15)";
-
-
-            tr.innerHTML = `
-
-                <td style="padding:12px;">
-                    ${row.timestamp || "-"}
-                </td>
-
-                <td style="padding:12px;">
-                    ${row.road_condition || "-"}
-                </td>
-
-                <td style="padding:12px;">
-                    ${Number(
-                        row.road_temperature || 0
-                    ).toFixed(2)} °C
-                </td>
-
-                <td style="padding:12px;">
-                    ${Number(
-                        row.ambient_temperature || 0
-                    ).toFixed(2)} °C
-                </td>
-
-                <td style="padding:12px;">
-                    ${Number(
-                        row.water_level_distance || 0
-                    ).toFixed(2)} cm
-                </td>
-
-                <td style="padding:12px;">
-                    ${Number(
-                        row.latitude || 0
-                    ).toFixed(6)}
-                </td>
-
-                <td style="padding:12px;">
-                    ${Number(
-                        row.longitude || 0
-                    ).toFixed(6)}
-                </td>
-
-                <td style="padding:12px;">
-                    ${row.satellites || 0}
-                </td>
-
-                <td style="padding:12px;">
-                    ${Number(
-                        row.speed || 0
-                    ).toFixed(2)} km/h
-                </td>
-
-                <td style="padding:12px;">
-                    ${row.sprinkler_decision || "UNKNOWN"}
-                </td>
-
-            `;
-
-            body.appendChild(tr);
+            behavior:"smooth"
 
         });
 
     }
 
-    catch (error) {
-
-        console.log(
-            "SQLite history error:",
-            error
-        );
-
-    }
-
 }
 
 
 /* =========================================================
-   SQLITE DATABASE RECORD COUNT
+   INITIALIZE
 ========================================================= */
 
-async function loadDatabaseCount() {
+updateTripStatus();
 
-    try {
-
-        const response =
-            await fetch("/database_count");
-
-        const data =
-            await response.json();
-
-        const countElement =
-            document.getElementById("databaseCount");
-
-        if (countElement) {
-
-            countElement.innerText =
-                data.total_records ?? 0;
-
-        }
-
-    }
-
-    catch (error) {
-
-        console.log(
-            "Database count error:",
-            error
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   REFRESH SQLITE HISTORY
-========================================================= */
-
-setInterval(
-    loadHistory,
-    5000
-);
-
-setInterval(
-    loadDatabaseCount,
-    5000
-);
-
-loadHistory();
-loadDatabaseCount();
+showTripHistory();
 
 </script>
-
 
 </body>
 
