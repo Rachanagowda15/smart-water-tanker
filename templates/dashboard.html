@@ -4,332 +4,859 @@
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Smart Water Tanker</title>
 
 <link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
+/* =========================================================
+   BASIC
+========================================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
 }
 
-body {
-    background: linear-gradient(135deg, #071b3a, #0b4f8a);
-    color: white;
-    min-height: 100vh;
+body{
+    background:
+        linear-gradient(
+            135deg,
+            #031a31,
+            #05294b,
+            #031a31
+        );
+    color:white;
+    min-height:100vh;
 }
 
-/* ================= HEADER ================= */
 
-.header {
-    padding: 20px 35px;
-    background: rgba(0, 0, 0, 0.25);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:205px;
+    height:100vh;
+    background:
+        linear-gradient(
+            180deg,
+            #062f61,
+            #04244a,
+            #02172f
+        );
+    border-right:1px solid #159ce8;
+    padding:35px 12px;
+    z-index:1000;
 }
 
-.header h1 {
-    font-size: 28px;
+.side-logo{
+    text-align:center;
+    font-size:50px;
+    margin-bottom:35px;
 }
 
-.header p {
-    margin-top: 5px;
-    color: #b9dcff;
+.menu{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
 }
 
-.status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: bold;
+.menu-item{
+    padding:15px 14px;
+    border-radius:14px;
+    color:#cbe8ff;
+    font-size:17px;
+    display:flex;
+    align-items:center;
+    gap:15px;
+    cursor:pointer;
+    transition:0.3s;
 }
 
-.status-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #00ff88;
-    box-shadow: 0 0 10px #00ff88;
+.menu-item:hover{
+    background:
+        linear-gradient(
+            90deg,
+            #078df2,
+            #1454bb
+        );
+    color:white;
+    transform:translateX(3px);
 }
 
-/* ================= CONTAINER ================= */
-
-.container {
-    padding: 25px 35px;
+.menu-item.active{
+    background:
+        linear-gradient(
+            90deg,
+            #078df2,
+            #1755c2
+        );
+    color:white;
+    box-shadow:
+        0 5px 25px
+        rgba(0,160,255,0.45);
 }
 
-/* ================= CARDS ================= */
-
-.cards {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 25px;
+.menu-icon{
+    font-size:25px;
+    width:30px;
+    text-align:center;
 }
 
-.card {
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 18px;
-    padding: 20px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.20);
+.side-bottom{
+    position:absolute;
+    bottom:25px;
+    left:15px;
+    right:15px;
+    text-align:center;
+    color:#8beaff;
+    font-size:14px;
+    line-height:1.5;
 }
 
-.card-title {
-    font-size: 14px;
-    color: #b9dcff;
-    margin-bottom: 10px;
+.side-bottom .drop{
+    font-size:45px;
+    margin-top:8px;
 }
 
-.card-value {
-    font-size: 28px;
-    font-weight: bold;
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.main{
+    margin-left:205px;
 }
 
-.card-sub {
-    margin-top: 8px;
-    font-size: 13px;
-    color: #c9e5ff;
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header{
+    min-height:112px;
+    padding:18px 30px;
+    background:
+        linear-gradient(
+            90deg,
+            #064c9e,
+            #087bd1,
+            #07519a,
+            #063e7b
+        );
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:
+        1px solid #19b9f5;
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+        0 4px 25px
+        rgba(0,150,255,0.25);
 }
 
-/* ================= MAIN GRID ================= */
-
-.main-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 20px;
+.header::after{
+    content:"";
+    position:absolute;
+    right:-100px;
+    bottom:-90px;
+    width:550px;
+    height:200px;
+    background:
+        rgba(255,255,255,0.08);
+    border-radius:50%;
 }
 
-/* ================= MAP ================= */
-
-.map-card {
-    background: rgba(255,255,255,0.10);
-    border-radius: 18px;
-    padding: 18px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.20);
+.brand{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    z-index:2;
 }
 
-.section-title {
-    font-size: 19px;
-    margin-bottom: 15px;
+.brand-icon{
+    font-size:55px;
 }
 
-#map {
-    height: 450px;
-    border-radius: 14px;
-    overflow: hidden;
+.brand h1{
+    font-size:37px;
+    font-weight:800;
 }
 
-/* ================= TRIP CONTROLS ================= */
-
-.trip-controls {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    flex-wrap: wrap;
+.brand h1 span{
+    color:#35e3ff;
 }
 
-.trip-btn {
-    border: none;
-    padding: 11px 18px;
-    border-radius: 9px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
+.brand p{
+    margin-top:5px;
+    font-size:17px;
+    color:#e8f8ff;
 }
 
-.start-btn {
-    background: #00a86b;
+.header-right{
+    display:flex;
+    gap:15px;
+    z-index:2;
 }
 
-.start-btn:hover {
-    background: #008f5a;
+.header-box{
+    min-width:190px;
+    padding:12px 17px;
+    border-radius:16px;
+    background:
+        rgba(0,20,55,0.45);
+    border:
+        1px solid
+        rgba(0,225,255,0.7);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    box-shadow:
+        0 0 18px
+        rgba(0,210,255,0.15);
 }
 
-.end-btn {
-    background: #e04b5a;
+.header-box-icon{
+    font-size:27px;
 }
 
-.end-btn:hover {
-    background: #c73c4a;
+.header-box strong{
+    color:#30f09d;
 }
 
-.history-btn {
-    background: #0784ff;
+.header-box small{
+    display:block;
+    margin-top:4px;
 }
 
-.history-btn:hover {
-    background: #006bd6;
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.content{
+    padding:25px;
 }
 
-.trip-status {
-    margin-top: 10px;
-    color: #b9dcff;
-    font-size: 13px;
+.section{
+    margin-bottom:25px;
 }
 
-/* ================= LIVE STATUS ================= */
-
-.live-card {
-    background: rgba(255,255,255,0.10);
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.20);
+.section-title{
+    font-size:25px;
+    color:#28ddff;
+    margin:
+        5px 0 15px 5px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-shadow:
+        0 0 12px
+        rgba(0,220,255,0.25);
 }
 
-.live-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 14px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
+
+/* =========================================================
+   FOUR CARDS
+========================================================= */
+
+.cards-4{
+    display:grid;
+    grid-template-columns:
+        repeat(4,1fr);
+    gap:15px;
 }
 
-.live-row:last-child {
-    border-bottom: none;
+.card{
+    min-height:150px;
+    border-radius:17px;
+    padding:20px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+        0 8px 25px
+        rgba(0,0,0,0.30);
+    border:
+        1px solid
+        rgba(255,255,255,0.22);
+    transition:0.3s;
 }
 
-.live-label {
-    color: #b9dcff;
+.card:hover{
+    transform:
+        translateY(-4px);
+    box-shadow:
+        0 12px 35px
+        rgba(0,190,255,0.38);
 }
 
-.live-value {
-    font-weight: bold;
+.card::after{
+    content:"";
+    position:absolute;
+    width:180px;
+    height:180px;
+    right:-70px;
+    bottom:-100px;
+    border-radius:50%;
+    background:
+        rgba(255,255,255,0.10);
 }
 
-/* ================= SPRINKLER ================= */
-
-.sprinkler-box {
-    margin-top: 20px;
-    padding: 20px;
-    border-radius: 15px;
-    text-align: center;
-    background: rgba(0,0,0,0.18);
+.purple{
+    background:
+        linear-gradient(
+            135deg,
+            #6937ef,
+            #5350eb,
+            #345bdc
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(90,50,255,0.30);
 }
 
-.sprinkler-title {
-    font-size: 15px;
-    color: #b9dcff;
-    margin-bottom: 8px;
+.orange{
+    background:
+        linear-gradient(
+            135deg,
+            #ffb31c,
+            #ff851b,
+            #ff6026
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(255,120,20,0.30);
 }
 
-#liveSprinkler {
-    font-size: 34px;
-    font-weight: bold;
+.pink{
+    background:
+        linear-gradient(
+            135deg,
+            #f52e78,
+            #f52268,
+            #e91e63
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(245,30,100,0.30);
 }
 
-/* ================= RULE BOX ================= */
-
-.rule-box {
-    margin-top: 18px;
-    padding: 15px;
-    border-radius: 14px;
-    background: rgba(0, 110, 255, 0.18);
-    border: 1px solid rgba(100,190,255,0.25);
+.cyan{
+    background:
+        linear-gradient(
+            135deg,
+            #0ac0e4,
+            #079ed0,
+            #0878bd
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(0,190,240,0.30);
 }
 
-.rule-title {
-    font-weight: bold;
-    margin-bottom: 8px;
+.blue{
+    background:
+        linear-gradient(
+            135deg,
+            #078ef0,
+            #0878df,
+            #1558ce
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(0,125,240,0.30);
 }
 
-.rule-text {
-    font-size: 13px;
-    line-height: 1.6;
-    color: #d5ecff;
+.green{
+    background:
+        linear-gradient(
+            135deg,
+            #18b960,
+            #0ca451,
+            #087c42
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(0,190,90,0.28);
 }
 
-/* ================= HISTORY ================= */
-
-.history-card {
-    margin-top: 20px;
-    background: rgba(255,255,255,0.10);
-    border-radius: 18px;
-    padding: 20px;
+.darkblue{
+    background:
+        linear-gradient(
+            135deg,
+            #124c9d,
+            #0b3d83,
+            #062c66
+        );
+    box-shadow:
+        0 8px 25px
+        rgba(0,90,190,0.30);
 }
 
-.history-info {
-    color: #c9e5ff;
-    line-height: 1.8;
-    font-size: 14px;
+
+/* =========================================================
+   CARD CONTENT
+========================================================= */
+
+.card-title{
+    font-size:18px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    gap:12px;
 }
 
-.history-list {
-    margin-top: 15px;
-    max-height: 300px;
-    overflow-y: auto;
+.card-icon{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:
+        rgba(255,255,255,0.15);
+    border:
+        1px solid
+        rgba(255,255,255,0.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:25px;
 }
 
-.history-item {
-    padding: 12px;
-    margin-bottom: 8px;
-    border-radius: 10px;
-    background: rgba(0,0,0,0.18);
-    border-left: 3px solid #0784ff;
+.value{
+    font-size:32px;
+    font-weight:800;
+    margin-top:18px;
 }
 
-.history-item b {
-    color: white;
+.unit{
+    font-size:17px;
+    font-weight:normal;
 }
 
-.history-item span {
-    color: #b9dcff;
+.subtext{
+    margin-top:7px;
+    color:
+        rgba(255,255,255,0.85);
 }
 
-.history-card button {
-    background: #0784ff;
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 12px;
+
+/* =========================================================
+   ROAD CONDITION
+========================================================= */
+
+.road-condition{
+    margin-top:15px;
 }
 
-.history-card button:hover {
-    background: #006bd6;
+.condition{
+    display:inline-block;
+    padding:9px 22px;
+    border-radius:10px;
+    background:
+        linear-gradient(
+            90deg,
+            #12c9ef,
+            #08b4eb
+        );
+    border:
+        1px solid
+        rgba(255,255,255,0.45);
+    font-size:19px;
+    font-weight:bold;
+    box-shadow:
+        0 0 18px
+        rgba(0,220,255,0.55);
 }
 
-/* ================= RESPONSIVE ================= */
 
-@media(max-width: 1000px) {
+/* =========================================================
+   WATER SECTION
+========================================================= */
 
-    .cards {
-        grid-template-columns: repeat(2, 1fr);
+.water-grid{
+    display:grid;
+    grid-template-columns:
+        1.6fr 1fr 1fr;
+    gap:15px;
+}
+
+.tank-card{
+    min-height:160px;
+}
+
+.tank-content{
+    display:flex;
+    justify-content:
+        space-between;
+    align-items:center;
+}
+
+.tank-value{
+    font-size:35px;
+    font-weight:bold;
+    margin-top:15px;
+}
+
+.water-bar{
+    width:240px;
+    height:14px;
+    margin-top:20px;
+    background:
+        rgba(0,30,75,0.65);
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.water-fill{
+    width:0%;
+    height:100%;
+    background:
+        linear-gradient(
+            90deg,
+            #b4f5ff,
+            #25e0ff,
+            #00a9ee
+        );
+    border-radius:20px;
+    transition:width 0.5s;
+    box-shadow:
+        0 0 10px
+        rgba(0,220,255,0.6);
+}
+
+.tank-emoji{
+    font-size:75px;
+}
+
+.sprinkler-status{
+    margin-top:17px;
+    display:inline-block;
+    padding:8px 22px;
+    background:
+        linear-gradient(
+            90deg,
+            #24df6c,
+            #0ec857
+        );
+    border-radius:13px;
+    font-size:22px;
+    font-weight:bold;
+    box-shadow:
+        0 0 20px
+        rgba(0,255,100,0.5);
+}
+
+
+/* =========================================================
+   GPS SECTION
+========================================================= */
+
+.gps-grid{
+    display:grid;
+    grid-template-columns:
+        2fr 0.75fr 0.75fr;
+    gap:15px;
+}
+
+.map-card{
+    min-height:350px;
+    padding:15px;
+}
+
+.map-title{
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+#map{
+    height:285px;
+    width:100%;
+    border-radius:14px;
+    border:
+        2px solid
+        rgba(80,220,255,0.7);
+    box-shadow:
+        0 0 18px
+        rgba(0,180,255,0.2);
+}
+
+.gps-side{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.gps-card{
+    flex:1;
+    min-height:100px;
+}
+
+.gps-number{
+    font-size:28px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+
+/* =========================================================
+   LIVE STATUS
+========================================================= */
+
+.live-card{
+    min-height:350px;
+    background:
+        linear-gradient(
+            145deg,
+            #118fdc,
+            #155bc5,
+            #103f97
+        );
+    border:
+        1px solid
+        #19a9ed;
+}
+
+.truck{
+    text-align:center;
+    font-size:80px;
+    margin:15px 0;
+}
+
+.moving{
+    display:inline-block;
+    padding:8px 20px;
+    background:white;
+    color:#1452a0;
+    border-radius:20px;
+    font-weight:bold;
+    box-shadow:
+        0 0 15px
+        rgba(255,255,255,0.2);
+}
+
+.live-row{
+    padding:10px 0;
+    border-bottom:
+        1px solid
+        rgba(255,255,255,0.2);
+    display:flex;
+    justify-content:
+        space-between;
+}
+
+.live-row span:last-child{
+    font-weight:bold;
+    color:#40ebff;
+}
+
+.green-text{
+    color:#39f28a !important;
+}
+
+
+/* =========================================================
+   EXTRA PAGES
+========================================================= */
+
+.extra-page{
+    display:none;
+    padding:25px;
+}
+
+.extra-title{
+    font-size:27px;
+    color:#43ddff;
+    margin-bottom:20px;
+}
+
+.history-card,
+.settings-card{
+    background:
+        linear-gradient(
+            135deg,
+            #103f78,
+            #092b55
+        );
+    border:
+        1px solid #168ed8;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:
+        0 8px 30px
+        rgba(0,0,0,0.3);
+}
+
+.history-card h3,
+.settings-card h3{
+    color:#42dcff;
+    margin-bottom:20px;
+}
+
+.history-row,
+.setting-row{
+    display:flex;
+    justify-content:
+        space-between;
+    align-items:center;
+    padding:18px 5px;
+    border-bottom:
+        1px solid
+        rgba(255,255,255,0.15);
+    font-size:17px;
+}
+
+.history-row span:last-child{
+    color:#35ed93;
+    font-weight:bold;
+}
+
+
+/* =========================================================
+   SETTINGS SWITCH
+========================================================= */
+
+.switch{
+    position:relative;
+    width:52px;
+    height:28px;
+}
+
+.switch input{
+    display:none;
+}
+
+.slider{
+    position:absolute;
+    cursor:pointer;
+    inset:0;
+    background:#45617c;
+    border-radius:30px;
+    transition:0.3s;
+}
+
+.slider:before{
+    content:"";
+    position:absolute;
+    height:22px;
+    width:22px;
+    left:3px;
+    bottom:3px;
+    background:white;
+    border-radius:50%;
+    transition:0.3s;
+}
+
+.switch input:checked + .slider{
+    background:
+        linear-gradient(
+            90deg,
+            #10c96b,
+            #2be878
+        );
+}
+
+.switch input:checked + .slider:before{
+    transform:
+        translateX(24px);
+}
+
+
+/* =========================================================
+   CONNECTION STATUS
+========================================================= */
+
+#connectionStatus{
+    transition:0.3s;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1200px){
+
+    .cards-4{
+        grid-template-columns:
+            repeat(2,1fr);
     }
 
-    .main-grid {
-        grid-template-columns: 1fr;
+    .water-grid{
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .gps-grid{
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .map-card{
+        grid-column:
+            span 2;
+    }
+
+    .live-card{
+        grid-column:
+            span 2;
     }
 }
 
-@media(max-width: 600px) {
+@media(max-width:800px){
 
-    .container {
-        padding: 15px;
+    .sidebar{
+        width:70px;
+        padding:
+            20px 8px;
     }
 
-    .header {
-        padding: 18px;
+    .main{
+        margin-left:70px;
     }
 
-    .cards {
-        grid-template-columns: 1fr;
+    .menu-item span:not(.menu-icon){
+        display:none;
     }
 
-    #map {
-        height: 350px;
+    .side-bottom{
+        display:none;
+    }
+
+    .header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .header-right{
+        flex-wrap:wrap;
+    }
+
+    .cards-4,
+    .water-grid,
+    .gps-grid{
+        grid-template-columns:
+            1fr;
+    }
+
+    .map-card,
+    .live-card{
+        grid-column:
+            span 1;
     }
 }
 
@@ -340,393 +867,873 @@ body {
 
 <body>
 
-<!-- ================= HEADER ================= -->
 
-<div class="header">
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
 
-    <div>
+<div class="sidebar">
 
-        <h1>💧 Smart Water Tanker</h1>
-
-        <p>
-            Intelligent Water Management & Road Sprinkling System
-        </p>
-
+    <div class="side-logo">
+        🚛
     </div>
 
-    <div class="status">
-
-        <span class="status-dot"></span>
-
-        <span id="connectionStatus">LIVE</span>
-
-    </div>
-
-</div>
-
-
-<div class="container">
-
-
-<!-- ================= TOP CARDS ================= -->
-
-<div class="cards">
-
-
-    <div class="card">
-
-        <div class="card-title">
-            🌡️ Road Temperature
-        </div>
-
-        <div class="card-value">
-
-            <span id="roadTemperature">--</span> °C
-
-        </div>
-
-        <div class="card-sub">
-            Thermal sensor reading
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <div class="card-title">
-            🌧️ Road Condition
-        </div>
-
-        <div class="card-value"
-             id="roadCondition">
-
-            --
-
-        </div>
-
-        <div class="card-sub">
-            Rain / moisture detection
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <div class="card-title">
-            💧 Water Level
-        </div>
-
-        <div class="card-value">
-
-            <span id="waterLevel">--</span> %
-
-        </div>
-
-        <div class="card-sub">
-            Ultrasonic sensor
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <div class="card-title">
-            🚿 Sprinkler
-        </div>
-
-        <div class="card-value"
-             id="sprinkler">
-
-            --
-
-        </div>
-
-        <div class="card-sub">
-            Temperature + Road Condition
-        </div>
-
-    </div>
-
-
-</div>
-
-
-<!-- ================= MAIN ================= -->
-
-<div class="main-grid">
-
-
-    <!-- ================= MAP ================= -->
-
-    <div class="map-card">
-
-        <div class="section-title">
-
-            📍 Live Tanker Location
-
-        </div>
-
-
-        <div id="map"></div>
-
-
-        <!-- ================= TRIP BUTTONS ================= -->
-
-        <div class="trip-controls">
-
-            <button
-                class="trip-btn start-btn"
-                onclick="startNewTrip()">
-
-                ▶ Start New Trip
-
-            </button>
-
-
-            <button
-                class="trip-btn end-btn"
-                onclick="endTrip()">
-
-                🏁 End Trip
-
-            </button>
-
-
-            <button
-                class="trip-btn history-btn"
-                onclick="loadGlobalHistory()">
-
-                📜 Load Global History
-
-            </button>
-
-        </div>
-
+    <div class="menu">
 
         <div
-            class="trip-status"
-            id="tripStatus">
+            class="menu-item active"
+            onclick="showPage('dashboard',this)"
+        >
+            <span class="menu-icon">⌂</span>
+            <span>Dashboard</span>
+        </div>
 
-            Trip Status: Ready
+        <div
+            class="menu-item"
+            onclick="showPage('map',this)"
+        >
+            <span class="menu-icon">📍</span>
+            <span>Live Map</span>
+        </div>
+
+        <div
+            class="menu-item"
+            onclick="showPage('sensors',this)"
+        >
+            <span class="menu-icon">📡</span>
+            <span>Sensor Data</span>
+        </div>
+
+        <div
+            class="menu-item"
+            onclick="showPage('history',this)"
+        >
+            <span class="menu-icon">◷</span>
+            <span>History</span>
+        </div>
+
+        <div
+            class="menu-item"
+            onclick="showPage('settings',this)"
+        >
+            <span class="menu-icon">⚙</span>
+            <span>Settings</span>
+        </div>
+
+    </div>
+
+    <div class="side-bottom">
+
+        <div style="font-size:35px;">
+            🌱
+        </div>
+
+        <p>
+            Saving Water<br>
+            for a Better<br>
+            Tomorrow
+        </p>
+
+        <div class="drop">
+            💧
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<div class="main">
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header class="header">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            💧
+        </div>
+
+        <div>
+
+            <h1>
+                Smart
+                <span>Water</span>
+                Tanker
+            </h1>
+
+            <p>
+                IoT-Based Smart Road Sprinkling System
+            </p>
 
         </div>
 
     </div>
 
 
-    <!-- ================= LIVE DATA ================= -->
+    <div class="header-right">
 
-    <div class="live-card">
+        <div class="header-box">
 
+            <div class="header-box-icon">
+                📶
+            </div>
 
-        <div class="section-title">
+            <div>
 
-            📊 Live Sensor Data
+                <strong id="connectionStatus">
+                    Connecting...
+                </strong>
 
-        </div>
+                <small id="connectionMessage">
+                    Connecting to Render backend
+                </small>
 
-
-        <div class="live-row">
-
-            <span class="live-label">
-                Road Temperature
-            </span>
-
-            <span class="live-value">
-
-                <span id="liveTemperature">
-                    --
-                </span> °C
-
-            </span>
+            </div>
 
         </div>
 
 
-        <div class="live-row">
+        <div class="header-box">
 
-            <span class="live-label">
-                Road Condition
-            </span>
+            <div class="header-box-icon">
+                📅
+            </div>
 
-            <span
-                class="live-value"
-                id="liveRoad">
+            <div>
 
-                --
+                <strong id="currentDate">
+                    Loading...
+                </strong>
 
-            </span>
+                <small id="currentTime">
+                    Loading...
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================================
+     DASHBOARD CONTENT
+========================================================= -->
+
+<div
+    class="content"
+    id="dashboardContent"
+>
+
+
+<!-- =========================================================
+     ROAD & ENVIRONMENT
+========================================================= -->
+
+<section
+    class="section"
+    id="sensorSection"
+>
+
+    <h2 class="section-title">
+        🌧️ Road & Environment
+    </h2>
+
+    <div class="cards-4">
+
+
+        <!-- ROAD CONDITION -->
+
+        <div class="card purple">
+
+            <div class="card-title">
+
+                <div class="card-icon">
+                    🌧️
+                </div>
+
+                <span>
+                    Road Condition
+                </span>
+
+            </div>
+
+            <div class="road-condition">
+
+                <div
+                    class="condition"
+                    id="roadCondition"
+                >
+                    UNKNOWN
+                </div>
+
+            </div>
+
+            <div class="subtext">
+                Raindrop Sensor
+            </div>
 
         </div>
 
 
-        <div class="live-row">
+        <!-- ROAD TEMPERATURE -->
 
-            <span class="live-label">
-                Water Level Distance
-            </span>
+        <div class="card orange">
 
-            <span class="live-value">
+            <div class="card-title">
 
-                <span id="waterDistance">
-                    --
-                </span> cm
+                <div class="card-icon">
+                    🌡️
+                </div>
 
-            </span>
+                <span>
+                    Road Temperature
+                </span>
 
-        </div>
+            </div>
 
+            <div class="value">
 
-        <div class="live-row">
+                <span id="roadTemp">
+                    0.00
+                </span>
 
-            <span class="live-label">
-                Ambient Temperature
-            </span>
+                <span class="unit">
+                    °C
+                </span>
 
-            <span class="live-value">
-
-                <span id="ambientTemperature">
-                    --
-                </span> °C
-
-            </span>
+            </div>
 
         </div>
 
 
-        <div class="live-row">
+        <!-- AMBIENT TEMPERATURE -->
 
-            <span class="live-label">
-                GPS Satellites
-            </span>
+        <div class="card pink">
 
-            <span
-                class="live-value"
-                id="satellites">
+            <div class="card-title">
 
-                --
+                <div class="card-icon">
+                    🌡️
+                </div>
 
-            </span>
+                <span>
+                    Ambient Temperature
+                </span>
+
+            </div>
+
+            <div class="value">
+
+                <span id="ambientTemp">
+                    0.00
+                </span>
+
+                <span class="unit">
+                    °C
+                </span>
+
+            </div>
 
         </div>
 
 
-        <div class="live-row">
+        <!-- RAIN SENSOR -->
 
-            <span class="live-label">
-                Speed
-            </span>
+        <div class="card cyan">
 
-            <span class="live-value">
+            <div class="card-title">
 
-                <span id="speed">
-                    --
-                </span> km/h
+                <div class="card-icon">
+                    💧
+                </div>
 
-            </span>
+                <span>
+                    Rain Sensor
+                </span>
+
+            </div>
+
+            <div class="value">
+
+                <span id="rainSensor">
+                    0
+                </span>
+
+            </div>
+
+            <div class="subtext">
+                Digital Output
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     WATER TANK & SPRINKLER
+========================================================= -->
+
+<section
+    class="section"
+    id="waterSection"
+>
+
+    <h2 class="section-title">
+        💧 Water Tank & Sprinkler
+    </h2>
+
+    <div class="water-grid">
+
+
+        <!-- TANK -->
+
+        <div class="card blue tank-card">
+
+            <div class="tank-content">
+
+                <div>
+
+                    <div class="card-title">
+
+                        <div class="card-icon">
+                            🚰
+                        </div>
+
+                        <span>
+                            Tank Level Distance
+                        </span>
+
+                    </div>
+
+                    <div class="tank-value">
+
+                        <span id="waterDistance">
+                            0.00
+                        </span>
+
+                        <span class="unit">
+                            cm
+                        </span>
+
+                    </div>
+
+                    <div class="water-bar">
+
+                        <div
+                            class="water-fill"
+                            id="waterFill"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <div class="tank-emoji">
+                    🛢️
+                </div>
+
+            </div>
 
         </div>
 
 
         <!-- SPRINKLER -->
 
-        <div class="sprinkler-box">
+        <div class="card green">
 
-            <div class="sprinkler-title">
+            <div class="card-title">
 
-                🚿 AUTOMATIC SPRINKLER
+                <div class="card-icon">
+                    📡
+                </div>
+
+                <span>
+                    Sprinkler
+                </span>
 
             </div>
 
-            <div id="liveSprinkler">
+            <div
+                class="sprinkler-status"
+                id="sprinkler"
+            >
+                UNKNOWN
+            </div>
 
-                --
+            <div class="subtext">
+                Temperature + Road Condition
+            </div>
+
+        </div>
+
+
+        <!-- SMART CONTROL -->
+
+        <div class="card darkblue">
+
+            <div
+                style="
+                    font-size:30px;
+                    margin-bottom:15px;
+                "
+            >
+                💧
+            </div>
+
+            <h3>
+                Smart Control
+            </h3>
+
+            <p
+                style="
+                    margin-top:7px;
+                    line-height:1.5;
+                    color:#d8eeff;
+                "
+            >
+                Less Water Wastage<br>
+                Greener Tomorrow
+            </p>
+
+            <div
+                style="
+                    font-size:42px;
+                    margin-top:12px;
+                "
+            >
+                🌱
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     GPS TRACKING
+========================================================= -->
+
+<section
+    class="section"
+    id="gpsSection"
+>
+
+    <h2 class="section-title">
+        📍 GPS Tracking
+    </h2>
+
+    <div class="gps-grid">
+
+
+        <!-- MAP -->
+
+        <div class="card darkblue map-card">
+
+            <div class="map-title">
+                📍 Tanker Live Location
+            </div>
+
+            <div
+                style="
+                    display:flex;
+                    gap:10px;
+                    flex-wrap:wrap;
+                    margin-bottom:12px;
+                "
+            >
+
+                <button
+                    onclick="startNewTrip()"
+                    style="
+                        border:none;
+                        padding:10px 16px;
+                        border-radius:10px;
+                        cursor:pointer;
+                        font-weight:bold;
+                        background:
+                        linear-gradient(
+                            90deg,
+                            #12c96b,
+                            #25e878
+                        );
+                        color:white;
+                        box-shadow:
+                        0 0 12px
+                        rgba(0,255,120,0.25);
+                    "
+                >
+                    🟢 START NEW TRIP
+                </button>
+
+
+                <button
+                    onclick="endCurrentTrip()"
+                    style="
+                        border:none;
+                        padding:10px 16px;
+                        border-radius:10px;
+                        cursor:pointer;
+                        font-weight:bold;
+                        background:
+                        linear-gradient(
+                            90deg,
+                            #ef4057,
+                            #d92f47
+                        );
+                        color:white;
+                        box-shadow:
+                        0 0 12px
+                        rgba(255,50,70,0.25);
+                    "
+                >
+                    🔴 END TRIP & SAVE
+                </button>
+
+            </div>
+
+
+            <div
+                id="tripStatus"
+                style="
+                    margin-bottom:10px;
+                    color:#8bdfff;
+                    font-weight:bold;
+                "
+            >
+                No active trip
+            </div>
+
+
+            <div id="map"></div>
+
+        </div>
+
+
+        <!-- GPS DATA -->
+
+        <div class="gps-side">
+
+
+            <!-- SATELLITES -->
+
+            <div class="card blue gps-card">
+
+                <div class="card-title">
+
+                    <div class="card-icon">
+                        🛰️
+                    </div>
+
+                    <span>
+                        Satellites
+                    </span>
+
+                </div>
+
+                <div class="gps-number">
+
+                    <span id="satellites">
+                        0
+                    </span>
+
+                </div>
+
+                <div class="subtext">
+                    satellites
+                </div>
+
+            </div>
+
+
+            <!-- ALTITUDE -->
+
+            <div class="card purple gps-card">
+
+                <div class="card-title">
+
+                    <div class="card-icon">
+                        ⛰️
+                    </div>
+
+                    <span>
+                        Altitude
+                    </span>
+
+                </div>
+
+                <div class="gps-number">
+
+                    <span id="altitude">
+                        0.00
+                    </span>
+
+                </div>
+
+                <div class="subtext">
+                    meters
+                </div>
+
+            </div>
+
+
+            <!-- SPEED -->
+
+            <div class="card cyan gps-card">
+
+                <div class="card-title">
+
+                    <div class="card-icon">
+                        🏎️
+                    </div>
+
+                    <span>
+                        Speed
+                    </span>
+
+                </div>
+
+                <div class="gps-number">
+
+                    <span id="speed">
+                        0.00
+                    </span>
+
+                </div>
+
+                <div class="subtext">
+                    km/h
+                </div>
 
             </div>
 
         </div>
 
 
-        <!-- LOGIC -->
+        <!-- LIVE STATUS -->
 
-        <div class="rule-box">
+        <div class="card live-card">
 
-            <div class="rule-title">
+            <div
+                style="
+                    text-align:center;
+                    margin-bottom:10px;
+                "
+            >
 
-                ⚙️ Sprinkler Decision Rule
+                <div class="moving" id="movingStatus">
+                    📍 Waiting for GPS
+                </div>
 
             </div>
 
-            <div class="rule-text">
+            <div class="truck">
+                🚛
+            </div>
 
-                <b>Temperature &gt; 30°C</b>
+            <div class="live-row">
 
-                AND
+                <span>
+                    🌧️ Road Condition
+                </span>
 
-                <b>Road = DRY</b>
+                <span id="liveRoad">
+                    UNKNOWN
+                </span>
 
-                → <b>SPRINKLER ON</b>
+            </div>
 
-                <br>
+            <div class="live-row">
 
-                Otherwise
+                <span>
+                    📡 Sprinkler
+                </span>
 
-                → <b>SPRINKLER OFF</b>
+                <span
+                    id="liveSprinkler"
+                    class="green-text"
+                >
+                    UNKNOWN
+                </span>
+
+            </div>
+
+            <div class="live-row">
+
+                <span>
+                    🚰 Water Level
+                </span>
+
+                <span id="liveWater">
+                    0%
+                </span>
+
+            </div>
+
+            <div class="live-row">
+
+                <span>
+                    🏎️ Tanker Speed
+                </span>
+
+                <span>
+
+                    <span id="liveSpeed">
+                        0.00
+                    </span>
+
+                    km/h
+
+                </span>
 
             </div>
 
         </div>
 
+    </div>
+
+</section>
+
+</div>
+
+
+<!-- =========================================================
+     HISTORY PAGE
+========================================================= -->
+
+<div
+    id="historyPage"
+    class="extra-page"
+>
+
+    <h2 class="extra-title">
+        🕐 Tanker History
+    </h2>
+
+    <div class="history-card">
+
+        <h3>
+            Saved Tanker Trips
+        </h3>
 
     </div>
 
 </div>
 
 
-<!-- ================= GLOBAL HISTORY ================= -->
+<!-- =========================================================
+     SETTINGS PAGE
+========================================================= -->
 
-<div class="history-card">
+<div
+    id="settingsPage"
+    class="extra-page"
+>
 
-    <div class="section-title">
+    <h2 class="extra-title">
+        ⚙️ Settings
+    </h2>
 
-        📜 Global Trip History
+    <div class="settings-card">
 
-    </div>
+        <h3>
+            Smart Water Tanker Settings
+        </h3>
 
+        <div class="setting-row">
 
-    <div
-        class="history-info"
-        id="historySummary">
+            <span>
+                🚿 Automatic Sprinkler
+            </span>
 
-        GPS history is loaded from the Render backend.
+            <label class="switch">
 
-    </div>
+                <input
+                    type="checkbox"
+                    checked
+                >
 
+                <span class="slider"></span>
 
-    <div
-        class="history-list"
-        id="historyList">
+            </label>
 
-        No history loaded yet.
-
-    </div>
-
-
-    <button onclick="loadGlobalHistory()">
-
-        🔄 Refresh Global History
-
-    </button>
+        </div>
 
 
-    <div
-        style="margin-top:15px;"
-        id="lastUpdate">
+        <div class="setting-row">
 
-        Waiting for sensor data...
+            <span>
+                📍 GPS Tracking
+            </span>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    checked
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <div class="setting-row">
+
+            <span>
+                💧 Water Wastage Alert
+            </span>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    checked
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <div class="setting-row">
+
+            <span>
+                📶 MQTT Monitoring
+            </span>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    checked
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
 
     </div>
 
@@ -736,456 +1743,197 @@ body {
 </div>
 
 
-<!-- ================= LEAFLET ================= -->
+<!-- =========================================================
+     LEAFLET
+========================================================= -->
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+<script
+src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
 </script>
 
 
 <script>
 
-/* =====================================================
-   BACKEND
-===================================================== */
+/* =========================================================
+   RENDER BACKEND
+========================================================= */
+
+/*
+   IMPORTANT:
+   Vercel dashboard -> Render Flask backend
+*/
 
 const BACKEND_URL =
     "https://smart-water-tanker.onrender.com";
 
 
-/* =====================================================
+/* =========================================================
    MAP
-===================================================== */
+========================================================= */
 
-let map = L.map('map').setView(
-    [12.9716, 77.5946],
-    12
-);
+let map =
+    L.map("map").setView(
+        [12.9716,77.5946],
+        13
+    );
 
 
 L.tileLayer(
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     {
+        maxZoom:19,
         attribution:
-            '&copy; OpenStreetMap contributors'
+        "&copy; OpenStreetMap contributors"
     }
 ).addTo(map);
 
 
-/* =====================================================
-   MAP VARIABLES
-===================================================== */
+let tankerMarker =
+    L.marker(
+        [12.9716,77.5946]
+    ).addTo(map);
 
-let tankerMarker = null;
 
-let startMarker = null;
+tankerMarker.bindPopup(
+    "<b>🚛 Smart Water Tanker</b><br>Live Location"
+);
 
-let endMarker = null;
+
+/* =========================================================
+   TRIP VARIABLES
+========================================================= */
+
+let routePoints =
+    JSON.parse(
+        localStorage.getItem(
+            "currentTankerRoute"
+        ) || "[]"
+    );
+
 
 let routeLine = null;
 
-let globalHistory = [];
 
-let tripStarted = false;
-
-
-/* =====================================================
-   UPDATE LIVE MARKER
-===================================================== */
-
-function updateMap(latitude, longitude) {
-
-    if (
-        latitude === undefined ||
-        longitude === undefined ||
-        latitude === 0 ||
-        longitude === 0 ||
-        isNaN(latitude) ||
-        isNaN(longitude)
-    ) {
-
-        return;
-
-    }
+let tripStarted =
+    localStorage.getItem(
+        "tripStarted"
+    ) === "true";
 
 
-    const position = [
-        latitude,
-        longitude
-    ];
+let tripStartTime =
+    localStorage.getItem(
+        "tripStartTime"
+    ) || null;
 
 
-    if (tankerMarker === null) {
-
-        tankerMarker =
-            L.marker(position)
-            .addTo(map)
-            .bindPopup(
-                "🚛 Smart Water Tanker"
-            );
-
-        map.setView(
-            position,
-            16
-        );
-
-    }
-
-    else {
-
-        tankerMarker.setLatLng(
-            position
-        );
-
-    }
-
-}
+let tripStartWater =
+    Number(
+        localStorage.getItem(
+            "tripStartWater"
+        ) || 0
+    );
 
 
-/* =====================================================
-   DRAW GLOBAL ROUTE
-===================================================== */
-
-function drawGlobalRoute(history) {
-
-    if (!history ||
-        history.length === 0) {
-
-        return;
-
-    }
+let savedTrips =
+    JSON.parse(
+        localStorage.getItem(
+            "tankerTripHistory"
+        ) || "[]"
+    );
 
 
-    const points = [];
+/* =========================================================
+   RESTORE ROUTE
+========================================================= */
 
-
-    history.forEach(item => {
-
-        const lat =
-            Number(item.latitude);
-
-        const lng =
-            Number(item.longitude);
-
-
-        if (
-            !isNaN(lat) &&
-            !isNaN(lng) &&
-            lat !== 0 &&
-            lng !== 0
-        ) {
-
-            points.push([
-                lat,
-                lng
-            ]);
-
-        }
-
-    });
-
-
-    if (points.length === 0) {
-
-        return;
-
-    }
-
-
-    /* Remove old route */
-
-    if (routeLine !== null) {
-
-        map.removeLayer(
-            routeLine
-        );
-
-    }
-
-
-    if (startMarker !== null) {
-
-        map.removeLayer(
-            startMarker
-        );
-
-    }
-
-
-    if (endMarker !== null) {
-
-        map.removeLayer(
-            endMarker
-        );
-
-    }
-
-
-    /* Draw route */
+if(routePoints.length > 0){
 
     routeLine =
         L.polyline(
-            points,
+            routePoints,
             {
-                weight: 5,
-                opacity: 0.9
+                color:"#00d4ff",
+                weight:5,
+                opacity:0.9
             }
         ).addTo(map);
 
 
-    /* START */
-
-    startMarker =
-        L.marker(
-            points[0]
-        )
-        .addTo(map)
-        .bindPopup(
-            "📍 Trip Start"
-        );
+    let last =
+        routePoints[
+            routePoints.length-1
+        ];
 
 
-    /* END */
+    tankerMarker.setLatLng(last);
 
-    endMarker =
-        L.marker(
-            points[points.length - 1]
-        )
-        .addTo(map)
-        .bindPopup(
-            "🏁 Latest / Trip End"
-        );
-
-
-    /* Fit route */
-
-    map.fitBounds(
-        routeLine.getBounds(),
-        {
-            padding: [20,20]
-        }
+    map.setView(
+        last,
+        17
     );
 
 }
 
 
-/* =====================================================
-   LOAD GLOBAL HISTORY
-===================================================== */
+/* =========================================================
+   TRIP STATUS
+========================================================= */
 
-async function loadGlobalHistory() {
+function updateTripStatus(){
 
-    try {
-
+    const box =
         document.getElementById(
-            "historySummary"
-        ).innerText =
-            "Loading global GPS history...";
-
-
-        const response =
-            await fetch(
-                BACKEND_URL +
-                "/history?t=" +
-                Date.now(),
-                {
-                    method: "GET",
-                    cache: "no-store"
-                }
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "History backend error"
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        if (!Array.isArray(data)) {
-
-            throw new Error(
-                "Invalid history data"
-            );
-
-        }
-
-
-        /* Backend sends newest first.
-           Reverse it for route order. */
-
-        globalHistory =
-            data.slice().reverse();
-
-
-        drawGlobalRoute(
-            globalHistory
+            "tripStatus"
         );
 
 
-        displayHistory(
-            data
-        );
+    if(!box) return;
 
 
-        document.getElementById(
-            "historySummary"
-        ).innerText =
-            "🌐 Global GPS History: " +
-            data.length +
-            " records loaded from Render.";
+    if(tripStarted){
 
+        box.innerText =
+            "🟢 Trip running • " +
+            routePoints.length +
+            " GPS points recorded";
 
-        console.log(
-            "GLOBAL HISTORY:",
-            data
-        );
+        box.style.color =
+            "#39f28a";
 
     }
+    else{
 
-    catch(error) {
+        box.innerText =
+            "No active trip";
 
-        console.error(
-            "History error:",
-            error
-        );
-
-
-        document.getElementById(
-            "historySummary"
-        ).innerText =
-            "Unable to load global history.";
+        box.style.color =
+            "#8bdfff";
 
     }
 
 }
 
 
-/* =====================================================
-   DISPLAY HISTORY
-===================================================== */
-
-function displayHistory(data) {
-
-    const list =
-        document.getElementById(
-            "historyList"
-        );
-
-
-    if (
-        !data ||
-        data.length === 0
-    ) {
-
-        list.innerHTML =
-            "No GPS history available.";
-
-        return;
-
-    }
-
-
-    let html = "";
-
-
-    data.forEach(
-        (item, index) => {
-
-            const lat =
-                Number(item.latitude);
-
-
-            const lng =
-                Number(item.longitude);
-
-
-            html += `
-
-                <div class="history-item">
-
-                    <b>
-                        GPS Record ${index + 1}
-                    </b>
-
-                    <br>
-
-                    <span>
-                        🕒 ${item.timestamp || "--"}
-                    </span>
-
-                    <br>
-
-                    <span>
-                        📍 Latitude:
-                        ${lat.toFixed(6)}
-                    </span>
-
-                    <br>
-
-                    <span>
-                        📍 Longitude:
-                        ${lng.toFixed(6)}
-                    </span>
-
-                    <br>
-
-                    <span>
-                        🌡️ Road:
-                        ${item.road_temperature ?? "--"} °C
-                    </span>
-
-                    <br>
-
-                    <span>
-                        🛣️ Condition:
-                        ${item.road_condition ?? "--"}
-                    </span>
-
-                    <br>
-
-                    <span>
-                        🚿 Sprinkler:
-                        ${item.sprinkler_decision ?? "--"}
-                    </span>
-
-                </div>
-
-            `;
-
-        }
-    );
-
-
-    list.innerHTML =
-        html;
-
-}
-
-
-/* =====================================================
+/* =========================================================
    START NEW TRIP
-===================================================== */
+========================================================= */
 
-function startNewTrip() {
+function startNewTrip(){
 
-    tripStarted = true;
+    if(
+        tripStarted &&
+        routePoints.length > 0
+    ){
+
+        saveCurrentTrip();
+
+    }
 
 
-    document.getElementById(
-        "tripStatus"
-    ).innerText =
-        "Trip Status: 🟢 Trip Started";
+    routePoints = [];
 
 
-    /* Clear old visual route */
-
-    if (routeLine !== null) {
+    if(routeLine){
 
         map.removeLayer(
             routeLine
@@ -1196,228 +1944,985 @@ function startNewTrip() {
     }
 
 
-    if (startMarker !== null) {
-
-        map.removeLayer(
-            startMarker
-        );
-
-        startMarker = null;
-
-    }
+    tripStarted = true;
 
 
-    if (endMarker !== null) {
-
-        map.removeLayer(
-            endMarker
-        );
-
-        endMarker = null;
-
-    }
+    tripStartTime =
+        new Date().toISOString();
 
 
-    /* Reload the global GPS history */
+    tripStartWater =
+        Number(
+            document.getElementById(
+                "liveWater"
+            ).innerText
+            .replace("%","")
+        ) || 0;
 
-    loadGlobalHistory();
+
+    localStorage.setItem(
+        "tripStarted",
+        "true"
+    );
+
+
+    localStorage.setItem(
+        "tripStartTime",
+        tripStartTime
+    );
+
+
+    localStorage.setItem(
+        "tripStartWater",
+        String(tripStartWater)
+    );
+
+
+    localStorage.setItem(
+        "currentTankerRoute",
+        "[]"
+    );
+
+
+    updateTripStatus();
 
 }
 
 
-/* =====================================================
-   END TRIP
-===================================================== */
+/* =========================================================
+   END CURRENT TRIP
+========================================================= */
 
-function endTrip() {
+function endCurrentTrip(){
+
+    if(!tripStarted){
+
+        alert(
+            "No active trip."
+        );
+
+        return;
+
+    }
+
+
+    if(routePoints.length === 0){
+
+        alert(
+            "Waiting for GPS location. Trip cannot be saved yet."
+        );
+
+        return;
+
+    }
+
+
+    saveCurrentTrip();
+
 
     tripStarted = false;
 
 
-    document.getElementById(
-        "tripStatus"
-    ).innerText =
-        "Trip Status: 🏁 Trip Ended";
+    localStorage.setItem(
+        "tripStarted",
+        "false"
+    );
 
 
-    /* Reload latest global history */
-
-    loadGlobalHistory();
-
-}
+    localStorage.removeItem(
+        "tripStartTime"
+    );
 
 
-/* =====================================================
-   WATER LEVEL
-===================================================== */
-
-function calculateWaterLevel(
-    distance
-) {
-
-    if (
-        distance === undefined ||
-        distance === null ||
-        distance < 0 ||
-        isNaN(distance)
-    ) {
-
-        return "--";
-
-    }
+    localStorage.removeItem(
+        "tripStartWater"
+    );
 
 
-    const MAX_DISTANCE = 100;
+    localStorage.removeItem(
+        "currentTankerRoute"
+    );
 
 
-    let percentage =
-        (
-            (MAX_DISTANCE - distance) /
-            MAX_DISTANCE
-        ) * 100;
+    routePoints = [];
 
 
-    percentage =
-        Math.max(
-            0,
-            Math.min(
-                100,
-                percentage
-            )
+    if(routeLine){
+
+        map.removeLayer(
+            routeLine
         );
 
-
-    return percentage.toFixed(0);
-
-}
-
-
-/* =====================================================
-   SPRINKLER DISPLAY
-===================================================== */
-
-function updateSprinklerDisplay(
-    data
-) {
-
-    const temperature =
-        Number(
-            data.road_temperature || 0
-        );
-
-
-    const road =
-        String(
-            data.road_condition ||
-            "UNKNOWN"
-        ).toUpperCase();
-
-
-    let expectedSprinkler =
-        "OFF";
-
-
-    if (
-        temperature > 30 &&
-        road === "DRY"
-    ) {
-
-        expectedSprinkler =
-            "ON";
+        routeLine = null;
 
     }
 
 
-    const actualSprinkler =
-        String(
-            data.sprinkler_decision ||
-            "UNKNOWN"
-        ).toUpperCase();
+    updateTripStatus();
+
+    showTripHistory();
 
 
-    document.getElementById(
-        "sprinkler"
-    ).innerText =
-        actualSprinkler;
-
-
-    document.getElementById(
-        "liveSprinkler"
-    ).innerText =
-        actualSprinkler;
-
-
-    if (
-        actualSprinkler === "ON"
-    ) {
-
-        document.getElementById(
-            "sprinkler"
-        ).style.color =
-            "#00ff88";
-
-
-        document.getElementById(
-            "liveSprinkler"
-        ).style.color =
-            "#00ff88";
-
-    }
-
-    else if (
-        actualSprinkler === "OFF"
-    ) {
-
-        document.getElementById(
-            "sprinkler"
-        ).style.color =
-            "#ff7070";
-
-
-        document.getElementById(
-            "liveSprinkler"
-        ).style.color =
-            "#ff7070";
-
-    }
-
-    else {
-
-        document.getElementById(
-            "sprinkler"
-        ).style.color =
-            "white";
-
-
-        document.getElementById(
-            "liveSprinkler"
-        ).style.color =
-            "white";
-
-    }
-
-
-    console.log(
-        "Expected:",
-        expectedSprinkler,
-        "Actual:",
-        actualSprinkler,
-        "Temperature:",
-        temperature,
-        "Road:",
-        road
+    alert(
+        "Trip saved successfully in History."
     );
 
 }
 
 
-/* =====================================================
-   GET LIVE DATA
-===================================================== */
+/* =========================================================
+   SAVE CURRENT TRIP
+========================================================= */
 
-async function updateDashboard() {
+function saveCurrentTrip(){
 
-    try {
+    if(
+        routePoints.length === 0
+    ){
+
+        return;
+
+    }
+
+
+    const start =
+        routePoints[0];
+
+
+    const end =
+        routePoints[
+            routePoints.length-1
+        ];
+
+
+    const currentWater =
+        Number(
+            document.getElementById(
+                "liveWater"
+            ).innerText
+            .replace("%","")
+        ) || 0;
+
+
+    const waterUsed =
+        Math.max(
+            0,
+            tripStartWater -
+            currentWater
+        );
+
+
+    const trip = {
+
+        id:Date.now(),
+
+        startTime:
+            tripStartTime ||
+            new Date().toISOString(),
+
+        endTime:
+            new Date().toISOString(),
+
+        startLocation:{
+            latitude:start[0],
+            longitude:start[1]
+        },
+
+        endLocation:{
+            latitude:end[0],
+            longitude:end[1]
+        },
+
+        route:[
+            ...routePoints
+        ],
+
+        distance:
+            calculateRouteDistance(
+                routePoints
+            ),
+
+        waterUsed:
+            waterUsed,
+
+        roadCondition:
+            document.getElementById(
+                "roadCondition"
+            ).innerText,
+
+        roadTemperature:
+            document.getElementById(
+                "roadTemp"
+            ).innerText,
+
+        sprinkler:
+            document.getElementById(
+                "sprinkler"
+            ).innerText
+
+    };
+
+
+    savedTrips.push(
+        trip
+    );
+
+
+    localStorage.setItem(
+        "tankerTripHistory",
+        JSON.stringify(
+            savedTrips
+        )
+    );
+
+}
+
+
+/* =========================================================
+   ROUTE DISTANCE
+========================================================= */
+
+function calculateRouteDistance(
+    points
+){
+
+    let total = 0;
+
+
+    for(
+        let i=1;
+        i<points.length;
+        i++
+    ){
+
+        total +=
+            calculateGPSDistance(
+
+                points[i-1][0],
+                points[i-1][1],
+
+                points[i][0],
+                points[i][1]
+
+            );
+
+    }
+
+
+    return total;
+
+}
+
+
+/* =========================================================
+   HAVERSINE DISTANCE
+========================================================= */
+
+function calculateGPSDistance(
+
+    lat1,
+    lon1,
+    lat2,
+    lon2
+
+){
+
+    const R = 6371;
+
+
+    const dLat =
+        (lat2-lat1)
+        * Math.PI/180;
+
+
+    const dLon =
+        (lon2-lon1)
+        * Math.PI/180;
+
+
+    const a =
+
+        Math.sin(
+            dLat/2
+        ) ** 2
+
+        +
+
+        Math.cos(
+            lat1*Math.PI/180
+        )
+
+        *
+
+        Math.cos(
+            lat2*Math.PI/180
+        )
+
+        *
+
+        Math.sin(
+            dLon/2
+        ) ** 2;
+
+
+    const c =
+        2 *
+        Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1-a)
+        );
+
+
+    return R*c;
+
+}
+
+
+/* =========================================================
+   ADD GPS POINT
+========================================================= */
+
+function addGPSPoint(
+    latitude,
+    longitude
+){
+
+    if(
+
+        !latitude ||
+        !longitude ||
+        latitude === 0 ||
+        longitude === 0
+
+    ){
+
+        return;
+
+    }
+
+
+    const point =
+        [
+            latitude,
+            longitude
+        ];
+
+
+    if(tripStarted){
+
+        if(
+            routePoints.length === 0
+        ){
+
+            routePoints.push(
+                point
+            );
+
+        }
+        else{
+
+            const last =
+                routePoints[
+                    routePoints.length-1
+                ];
+
+
+            const moved =
+                calculateGPSDistance(
+
+                    last[0],
+                    last[1],
+
+                    latitude,
+                    longitude
+
+                );
+
+
+            if(moved > 0.005){
+
+                routePoints.push(
+                    point
+                );
+
+            }
+
+        }
+
+
+        if(!routeLine){
+
+            routeLine =
+                L.polyline(
+                    routePoints,
+                    {
+
+                        color:"#00d4ff",
+
+                        weight:5,
+
+                        opacity:0.9
+
+                    }
+                ).addTo(map);
+
+        }
+        else{
+
+            routeLine.setLatLngs(
+                routePoints
+            );
+
+        }
+
+
+        localStorage.setItem(
+            "currentTankerRoute",
+            JSON.stringify(
+                routePoints
+            )
+        );
+
+    }
+
+
+    tankerMarker.setLatLng(
+        point
+    );
+
+
+    map.setView(
+        point,
+        17
+    );
+
+
+    updateTripStatus();
+
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function showTripHistory(){
+
+    const card =
+        document.querySelector(
+            "#historyPage .history-card"
+        );
+
+
+    if(!card) return;
+
+
+    if(savedTrips.length === 0){
+
+        card.innerHTML = `
+
+            <h3>
+                Saved Tanker Trips
+            </h3>
+
+            <div class="history-row">
+
+                <span>
+                    📋 Trip History
+                </span>
+
+                <span>
+                    No saved trips yet
+                </span>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    let html =
+        `<h3>Saved Tanker Trips</h3>`;
+
+
+    [...savedTrips]
+        .reverse()
+        .forEach(
+            (trip,index)=>{
+
+                const tripNumber =
+                    savedTrips.length-index;
+
+
+                const startDate =
+                    new Date(
+                        trip.startTime
+                    ).toLocaleString(
+                        "en-IN"
+                    );
+
+
+                const endDate =
+                    new Date(
+                        trip.endTime
+                    ).toLocaleString(
+                        "en-IN"
+                    );
+
+
+                html += `
+
+                    <div
+                        style="
+                            margin-top:15px;
+                            padding:18px;
+                            border:
+                            1px solid
+                            rgba(255,255,255,0.15);
+                            border-radius:14px;
+                            background:
+                            rgba(0,20,55,0.3);
+                        "
+                    >
+
+                        <h3
+                            style="
+                                margin-bottom:12px;
+                            "
+                        >
+                            🚛 Trip ${tripNumber}
+                        </h3>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                📅 Started
+                            </span>
+
+                            <span>
+                                ${startDate}
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                🏁 Ended
+                            </span>
+
+                            <span>
+                                ${endDate}
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                📏 Distance
+                            </span>
+
+                            <span>
+                                ${trip.distance.toFixed(2)}
+                                km
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                💧 Water Used
+                            </span>
+
+                            <span>
+                                ${trip.waterUsed.toFixed(1)}
+                                %
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                🌧️ Road Condition
+                            </span>
+
+                            <span>
+                                ${trip.roadCondition}
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                🌡️ Road Temperature
+                            </span>
+
+                            <span>
+                                ${trip.roadTemperature}
+                                °C
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-row">
+
+                            <span>
+                                📡 Sprinkler
+                            </span>
+
+                            <span>
+                                ${trip.sprinkler}
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            style="
+                                margin-top:12px;
+                                color:#d5ecff;
+                            "
+                        >
+
+                            📍 Start:
+
+                            ${trip.startLocation.latitude.toFixed(5)},
+
+                            ${trip.startLocation.longitude.toFixed(5)}
+
+                            <br><br>
+
+                            🏁 End:
+
+                            ${trip.endLocation.latitude.toFixed(5)},
+
+                            ${trip.endLocation.longitude.toFixed(5)}
+
+                        </div>
+
+
+                        <button
+                            onclick="
+                            viewSavedTrip(${trip.id})
+                            "
+                            style="
+                                margin-top:14px;
+                                border:none;
+                                padding:9px 15px;
+                                border-radius:9px;
+                                cursor:pointer;
+                                font-weight:bold;
+                                background:
+                                linear-gradient(
+                                    90deg,
+                                    #078ef0,
+                                    #155bd0
+                                );
+                                color:white;
+                            "
+                        >
+
+                            🗺️ VIEW ROUTE
+
+                        </button>
+
+
+                        <button
+                            onclick="
+                            deleteSavedTrip(${trip.id})
+                            "
+                            style="
+                                margin-top:14px;
+                                margin-left:7px;
+                                border:none;
+                                padding:9px 15px;
+                                border-radius:9px;
+                                cursor:pointer;
+                                font-weight:bold;
+                                background:#e94b5f;
+                                color:white;
+                            "
+                        >
+
+                            🗑️ DELETE
+
+                        </button>
+
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+
+    card.innerHTML =
+        html;
+
+}
+
+
+/* =========================================================
+   VIEW OLD TRIP
+========================================================= */
+
+function viewSavedTrip(id){
+
+    const trip =
+        savedTrips.find(
+            item =>
+            item.id === id
+        );
+
+
+    if(!trip) return;
+
+
+    if(routeLine){
+
+        map.removeLayer(
+            routeLine
+        );
+
+    }
+
+
+    routeLine =
+        L.polyline(
+            trip.route,
+            {
+
+                color:"#ffd21f",
+
+                weight:6,
+
+                opacity:0.95
+
+            }
+        ).addTo(map);
+
+
+    map.fitBounds(
+        routeLine.getBounds()
+    );
+
+
+    L.marker(
+        trip.route[0]
+    )
+    .addTo(map)
+    .bindPopup(
+        "📍 Trip Start"
+    )
+    .openPopup();
+
+
+    L.marker(
+        trip.route[
+            trip.route.length-1
+        ]
+    )
+    .addTo(map)
+    .bindPopup(
+        "🏁 Trip End"
+    );
+
+
+    showPage(
+        "map",
+        document.querySelector(
+            ".menu-item:nth-child(2)"
+        )
+    );
+
+
+    setTimeout(
+        function(){
+
+            map.invalidateSize();
+
+        },
+        500
+    );
+
+}
+
+
+/* =========================================================
+   DELETE TRIP
+========================================================= */
+
+function deleteSavedTrip(id){
+
+    if(
+        !confirm(
+            "Delete this saved trip?"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    savedTrips =
+        savedTrips.filter(
+            trip =>
+            trip.id !== id
+        );
+
+
+    localStorage.setItem(
+        "tankerTripHistory",
+        JSON.stringify(
+            savedTrips
+        )
+    );
+
+
+    showTripHistory();
+
+}
+
+
+/* =========================================================
+   CLOCK
+========================================================= */
+
+function updateClock(){
+
+    const now =
+        new Date();
+
+
+    const date =
+        now.toLocaleDateString(
+            "en-IN",
+            {
+
+                day:"2-digit",
+
+                month:"short",
+
+                year:"numeric"
+
+            }
+        );
+
+
+    const time =
+        now.toLocaleTimeString(
+            "en-IN",
+            {
+
+                hour:"2-digit",
+
+                minute:"2-digit",
+
+                second:"2-digit"
+
+            }
+        );
+
+
+    document.getElementById(
+        "currentDate"
+    ).innerText =
+        date;
+
+
+    document.getElementById(
+        "currentTime"
+    ).innerText =
+        time;
+
+}
+
+
+setInterval(
+    updateClock,
+    1000
+);
+
+
+updateClock();
+
+
+/* =========================================================
+   CONNECTION STATUS
+========================================================= */
+
+function setConnectionStatus(
+    connected
+){
+
+    const status =
+        document.getElementById(
+            "connectionStatus"
+        );
+
+
+    const message =
+        document.getElementById(
+            "connectionMessage"
+        );
+
+
+    if(connected){
+
+        status.innerText =
+            "Backend Connected";
+
+        status.style.color =
+            "#30f09d";
+
+        message.innerText =
+            "Receiving ESP32 data";
+
+    }
+    else{
+
+        status.innerText =
+            "Backend Offline";
+
+        status.style.color =
+            "#ff6b6b";
+
+        message.innerText =
+            "Waiting for Render";
+
+    }
+
+}
+
+
+/* =========================================================
+   UPDATE DASHBOARD
+========================================================= */
+
+async function updateDashboard(){
+
+    try{
+
+        /*
+           Cache disabled so Vercel does not
+           display an old response.
+        */
 
         const response =
             await fetch(
@@ -1425,16 +2930,17 @@ async function updateDashboard() {
                 "/data?t=" +
                 Date.now(),
                 {
-                    method: "GET",
-                    cache: "no-store"
+                    method:"GET",
+                    cache:"no-store"
                 }
             );
 
 
-        if (!response.ok) {
+        if(!response.ok){
 
             throw new Error(
-                "Backend error"
+                "Backend HTTP error: " +
+                response.status
             );
 
         }
@@ -1450,31 +2956,12 @@ async function updateDashboard() {
         );
 
 
-        /* ============================
-           TEMPERATURE
-        ============================ */
-
-        const roadTemperature =
-            Number(
-                data.road_temperature
-            );
+        setConnectionStatus(true);
 
 
-        document.getElementById(
-            "roadTemperature"
-        ).innerText =
-            roadTemperature.toFixed(2);
-
-
-        document.getElementById(
-            "liveTemperature"
-        ).innerText =
-            roadTemperature.toFixed(2);
-
-
-        /* ============================
+        /* =================================================
            ROAD CONDITION
-        ============================ */
+        ================================================= */
 
         const road =
             data.road_condition ||
@@ -1493,111 +2980,236 @@ async function updateDashboard() {
             road;
 
 
-        /* ============================
+        /* =================================================
+           ROAD TEMPERATURE
+        ================================================= */
+
+        document.getElementById(
+            "roadTemp"
+        ).innerText =
+
+            Number(
+                data.road_temperature ?? 0
+            ).toFixed(2);
+
+
+        /* =================================================
+           AMBIENT TEMPERATURE
+        ================================================= */
+
+        document.getElementById(
+            "ambientTemp"
+        ).innerText =
+
+            Number(
+                data.ambient_temperature ?? 0
+            ).toFixed(2);
+
+
+        /* =================================================
+           RAIN SENSOR
+        ================================================= */
+
+        document.getElementById(
+            "rainSensor"
+        ).innerText =
+
+            data.rain_sensor ?? 0;
+
+
+        /* =================================================
            WATER LEVEL
-        ============================ */
+        ================================================= */
 
         const distance =
             Number(
-                data.water_level_distance
+                data.water_level_distance ?? 0
             );
 
 
         document.getElementById(
             "waterDistance"
         ).innerText =
-            distance >= 0
-            ? distance.toFixed(2)
-            : "--";
+
+            distance.toFixed(2);
 
 
-        document.getElementById(
-            "waterLevel"
-        ).innerText =
-            calculateWaterLevel(
-                distance
+        /*
+           IMPORTANT:
+           Change this number to your real
+           tanker tank height.
+
+           For now:
+           100 cm = completely empty distance.
+        */
+
+        const MAX_DISTANCE = 100;
+
+
+        let waterPercent =
+
+            100 -
+            (
+                distance /
+                MAX_DISTANCE *
+                100
             );
 
 
-        /* ============================
-           AMBIENT TEMPERATURE
-        ============================ */
+        waterPercent =
 
-        const ambient =
-            Number(
-                data.ambient_temperature
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    waterPercent
+                )
             );
 
 
         document.getElementById(
-            "ambientTemperature"
+            "waterFill"
+        ).style.width =
+
+            waterPercent + "%";
+
+
+        document.getElementById(
+            "liveWater"
         ).innerText =
-            ambient.toFixed(2);
+
+            Math.round(
+                waterPercent
+            ) + "%";
 
 
-        /* ============================
-           GPS
-        ============================ */
+        /* =================================================
+           SPRINKLER
+        ================================================= */
+
+        const sprinkler =
+            data.sprinkler_decision ||
+            "UNKNOWN";
+
+
+        document.getElementById(
+            "sprinkler"
+        ).innerText =
+            sprinkler;
+
+
+        document.getElementById(
+            "liveSprinkler"
+        ).innerText =
+            sprinkler;
+
+
+        /* =================================================
+           SATELLITES
+        ================================================= */
 
         document.getElementById(
             "satellites"
         ).innerText =
-            data.satellites ?? "--";
 
+            data.satellites ?? 0;
+
+
+        /* =================================================
+           ALTITUDE
+        ================================================= */
+
+        document.getElementById(
+            "altitude"
+        ).innerText =
+
+            Number(
+                data.altitude ?? 0
+            ).toFixed(2);
+
+
+        /* =================================================
+           SPEED
+        ================================================= */
 
         const speed =
             Number(
-                data.speed || 0
+                data.speed ?? 0
             );
 
 
         document.getElementById(
             "speed"
         ).innerText =
+
             speed.toFixed(2);
 
 
-        updateMap(
-            Number(data.latitude),
-            Number(data.longitude)
-        );
-
-
-        /* ============================
-           SPRINKLER
-        ============================ */
-
-        updateSprinklerDisplay(
-            data
-        );
-
-
-        /* ============================
-           LAST UPDATE
-        ============================ */
-
         document.getElementById(
-            "lastUpdate"
+            "liveSpeed"
         ).innerText =
-            "Last updated: " +
-            (
-                data.timestamp ||
-                new Date().toLocaleString()
+
+            speed.toFixed(2);
+
+
+        /* =================================================
+           MOVING STATUS
+        ================================================= */
+
+        const movingStatus =
+            document.getElementById(
+                "movingStatus"
             );
 
 
-        /* ============================
-           CONNECTION
-        ============================ */
+        if(speed > 0.5){
 
-        document.getElementById(
-            "connectionStatus"
-        ).innerText =
-            "LIVE";
+            movingStatus.innerText =
+                "🚛 Tanker is moving";
+
+        }
+        else{
+
+            movingStatus.innerText =
+                "🅿️ Tanker is stationary";
+
+        }
+
+
+        /* =================================================
+           GPS
+        ================================================= */
+
+        const latitude =
+            Number(
+                data.latitude ?? 0
+            );
+
+
+        const longitude =
+            Number(
+                data.longitude ?? 0
+            );
+
+
+        if(
+
+            latitude !== 0 &&
+            longitude !== 0
+
+        ){
+
+            addGPSPoint(
+                latitude,
+                longitude
+            );
+
+        }
+
 
     }
 
-    catch(error) {
+    catch(error){
 
         console.error(
             "Dashboard error:",
@@ -1605,28 +3217,16 @@ async function updateDashboard() {
         );
 
 
-        document.getElementById(
-            "connectionStatus"
-        ).innerText =
-            "OFFLINE";
+        setConnectionStatus(false);
 
     }
 
 }
 
 
-/* =====================================================
-   INITIAL LOAD
-===================================================== */
-
-updateDashboard();
-
-loadGlobalHistory();
-
-
-/* =====================================================
-   AUTO UPDATE
-===================================================== */
+/* =========================================================
+   UPDATE EVERY 2 SECONDS
+========================================================= */
 
 setInterval(
     updateDashboard,
@@ -1634,16 +3234,229 @@ setInterval(
 );
 
 
-/*
-   Refresh global route periodically.
-   This means GPS points received by Render
-   become visible on every device.
-*/
+updateDashboard();
 
-setInterval(
-    loadGlobalHistory,
-    10000
-);
+
+/* =========================================================
+   SIDEBAR NAVIGATION
+========================================================= */
+
+function showPage(
+    page,
+    element
+){
+
+    document
+        .querySelectorAll(
+            ".menu-item"
+        )
+        .forEach(
+            item => {
+
+                item.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    if(element){
+
+        element.classList.add(
+            "active"
+        );
+
+    }
+
+
+    /* DASHBOARD */
+
+    if(page === "dashboard"){
+
+        document.getElementById(
+            "dashboardContent"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "historyPage"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "settingsPage"
+        ).style.display =
+            "none";
+
+
+        window.scrollTo({
+
+            top:0,
+
+            behavior:"smooth"
+
+        });
+
+    }
+
+
+    /* LIVE MAP */
+
+    else if(page === "map"){
+
+        document.getElementById(
+            "dashboardContent"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "historyPage"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "settingsPage"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "gpsSection"
+        ).scrollIntoView({
+
+            behavior:"smooth"
+
+        });
+
+
+        setTimeout(
+            function(){
+
+                map.invalidateSize();
+
+            },
+            500
+        );
+
+    }
+
+
+    /* SENSOR DATA */
+
+    else if(page === "sensors"){
+
+        document.getElementById(
+            "dashboardContent"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "historyPage"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "settingsPage"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "sensorSection"
+        ).scrollIntoView({
+
+            behavior:"smooth"
+
+        });
+
+    }
+
+
+    /* HISTORY */
+
+    else if(page === "history"){
+
+        document.getElementById(
+            "dashboardContent"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "historyPage"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "settingsPage"
+        ).style.display =
+            "none";
+
+
+        showTripHistory();
+
+
+        window.scrollTo({
+
+            top:0,
+
+            behavior:"smooth"
+
+        });
+
+    }
+
+
+    /* SETTINGS */
+
+    else if(page === "settings"){
+
+        document.getElementById(
+            "dashboardContent"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "historyPage"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "settingsPage"
+        ).style.display =
+            "block";
+
+
+        window.scrollTo({
+
+            top:0,
+
+            behavior:"smooth"
+
+        });
+
+    }
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+updateTripStatus();
+
+showTripHistory();
 
 </script>
 
