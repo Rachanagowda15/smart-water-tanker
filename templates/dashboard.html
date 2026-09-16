@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Smart Water Tanker</title>
 
 <link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
 
@@ -131,55 +128,6 @@ body {
     overflow: hidden;
 }
 
-/* ================= TRIP CONTROLS ================= */
-
-.trip-controls {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-}
-
-.trip-btn {
-    border: none;
-    padding: 11px 18px;
-    border-radius: 9px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.start-btn {
-    background: #00a86b;
-}
-
-.start-btn:hover {
-    background: #008f5a;
-}
-
-.end-btn {
-    background: #e04b5a;
-}
-
-.end-btn:hover {
-    background: #c73c4a;
-}
-
-.history-btn {
-    background: #0784ff;
-}
-
-.history-btn:hover {
-    background: #006bd6;
-}
-
-.trip-status {
-    margin-top: 10px;
-    color: #b9dcff;
-    font-size: 13px;
-}
-
 /* ================= LIVE STATUS ================= */
 
 .live-card {
@@ -259,34 +207,6 @@ body {
     padding: 20px;
 }
 
-.history-info {
-    color: #c9e5ff;
-    line-height: 1.8;
-    font-size: 14px;
-}
-
-.history-list {
-    margin-top: 15px;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.history-item {
-    padding: 12px;
-    margin-bottom: 8px;
-    border-radius: 10px;
-    background: rgba(0,0,0,0.18);
-    border-left: 3px solid #0784ff;
-}
-
-.history-item b {
-    color: white;
-}
-
-.history-item span {
-    color: #b9dcff;
-}
-
 .history-card button {
     background: #0784ff;
     color: white;
@@ -334,9 +254,7 @@ body {
 }
 
 </style>
-
 </head>
-
 
 <body>
 
@@ -345,21 +263,13 @@ body {
 <div class="header">
 
     <div>
-
         <h1>💧 Smart Water Tanker</h1>
-
-        <p>
-            Intelligent Water Management & Road Sprinkling System
-        </p>
-
+        <p>Intelligent Water Management & Road Sprinkling System</p>
     </div>
 
     <div class="status">
-
         <span class="status-dot"></span>
-
         <span id="connectionStatus">LIVE</span>
-
     </div>
 
 </div>
@@ -367,89 +277,60 @@ body {
 
 <div class="container">
 
-
 <!-- ================= TOP CARDS ================= -->
 
 <div class="cards">
 
-
     <div class="card">
-
-        <div class="card-title">
-            🌡️ Road Temperature
-        </div>
+        <div class="card-title">🌡️ Road Temperature</div>
 
         <div class="card-value">
-
             <span id="roadTemperature">--</span> °C
-
         </div>
 
         <div class="card-sub">
             Thermal sensor reading
         </div>
-
     </div>
 
 
     <div class="card">
+        <div class="card-title">🌧️ Road Condition</div>
 
-        <div class="card-title">
-            🌧️ Road Condition
-        </div>
-
-        <div class="card-value"
-             id="roadCondition">
-
+        <div class="card-value" id="roadCondition">
             --
-
         </div>
 
         <div class="card-sub">
             Rain / moisture detection
         </div>
-
     </div>
 
 
     <div class="card">
-
-        <div class="card-title">
-            💧 Water Level
-        </div>
+        <div class="card-title">💧 Water Level</div>
 
         <div class="card-value">
-
             <span id="waterLevel">--</span> %
-
         </div>
 
         <div class="card-sub">
             Ultrasonic sensor
         </div>
-
     </div>
 
 
     <div class="card">
+        <div class="card-title">🚿 Sprinkler</div>
 
-        <div class="card-title">
-            🚿 Sprinkler
-        </div>
-
-        <div class="card-value"
-             id="sprinkler">
-
+        <div class="card-value" id="sprinkler">
             --
-
         </div>
 
         <div class="card-sub">
             Temperature + Road Condition
         </div>
-
     </div>
-
 
 </div>
 
@@ -458,74 +339,25 @@ body {
 
 <div class="main-grid">
 
-
-    <!-- ================= MAP ================= -->
+    <!-- MAP -->
 
     <div class="map-card">
 
         <div class="section-title">
-
             📍 Live Tanker Location
-
         </div>
-
 
         <div id="map"></div>
-
-
-        <!-- ================= TRIP BUTTONS ================= -->
-
-        <div class="trip-controls">
-
-            <button
-                class="trip-btn start-btn"
-                onclick="startNewTrip()">
-
-                ▶ Start New Trip
-
-            </button>
-
-
-            <button
-                class="trip-btn end-btn"
-                onclick="endTrip()">
-
-                🏁 End Trip
-
-            </button>
-
-
-            <button
-                class="trip-btn history-btn"
-                onclick="loadGlobalHistory()">
-
-                📜 Load Global History
-
-            </button>
-
-        </div>
-
-
-        <div
-            class="trip-status"
-            id="tripStatus">
-
-            Trip Status: Ready
-
-        </div>
 
     </div>
 
 
-    <!-- ================= LIVE DATA ================= -->
+    <!-- LIVE DATA -->
 
     <div class="live-card">
 
-
         <div class="section-title">
-
             📊 Live Sensor Data
-
         </div>
 
 
@@ -536,11 +368,7 @@ body {
             </span>
 
             <span class="live-value">
-
-                <span id="liveTemperature">
-                    --
-                </span> °C
-
+                <span id="liveTemperature">--</span> °C
             </span>
 
         </div>
@@ -552,12 +380,8 @@ body {
                 Road Condition
             </span>
 
-            <span
-                class="live-value"
-                id="liveRoad">
-
+            <span class="live-value" id="liveRoad">
                 --
-
             </span>
 
         </div>
@@ -570,11 +394,7 @@ body {
             </span>
 
             <span class="live-value">
-
-                <span id="waterDistance">
-                    --
-                </span> cm
-
+                <span id="waterDistance">--</span> cm
             </span>
 
         </div>
@@ -587,11 +407,7 @@ body {
             </span>
 
             <span class="live-value">
-
-                <span id="ambientTemperature">
-                    --
-                </span> °C
-
+                <span id="ambientTemperature">--</span> °C
             </span>
 
         </div>
@@ -603,12 +419,8 @@ body {
                 GPS Satellites
             </span>
 
-            <span
-                class="live-value"
-                id="satellites">
-
+            <span class="live-value" id="satellites">
                 --
-
             </span>
 
         </div>
@@ -621,30 +433,22 @@ body {
             </span>
 
             <span class="live-value">
-
-                <span id="speed">
-                    --
-                </span> km/h
-
+                <span id="speed">--</span> km/h
             </span>
 
         </div>
 
 
-        <!-- SPRINKLER -->
+        <!-- SPRINKLER STATUS -->
 
         <div class="sprinkler-box">
 
             <div class="sprinkler-title">
-
                 🚿 AUTOMATIC SPRINKLER
-
             </div>
 
             <div id="liveSprinkler">
-
                 --
-
             </div>
 
         </div>
@@ -655,91 +459,54 @@ body {
         <div class="rule-box">
 
             <div class="rule-title">
-
                 ⚙️ Sprinkler Decision Rule
-
             </div>
 
             <div class="rule-text">
 
                 <b>Temperature &gt; 30°C</b>
-
                 AND
-
                 <b>Road = DRY</b>
-
                 → <b>SPRINKLER ON</b>
 
                 <br>
 
                 Otherwise
-
                 → <b>SPRINKLER OFF</b>
 
             </div>
 
         </div>
 
-
     </div>
 
 </div>
 
 
-<!-- ================= GLOBAL HISTORY ================= -->
+<!-- ================= HISTORY ================= -->
 
 <div class="history-card">
 
     <div class="section-title">
-
-        📜 Global Trip History
-
+        📜 System Information
     </div>
 
+    <p id="lastUpdate">
+        Waiting for sensor data...
+    </p>
 
-    <div
-        class="history-info"
-        id="historySummary">
-
-        GPS history is loaded from the Render backend.
-
-    </div>
-
-
-    <div
-        class="history-list"
-        id="historyList">
-
-        No history loaded yet.
-
-    </div>
-
-
-    <button onclick="loadGlobalHistory()">
-
-        🔄 Refresh Global History
-
+    <button onclick="updateDashboard()">
+        🔄 Refresh Data
     </button>
 
-
-    <div
-        style="margin-top:15px;"
-        id="lastUpdate">
-
-        Waiting for sensor data...
-
-    </div>
-
 </div>
-
 
 </div>
 
 
 <!-- ================= LEAFLET ================= -->
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
-</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 
 <script>
@@ -765,31 +532,16 @@ let map = L.map('map').setView(
 L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
-        attribution:
-            '&copy; OpenStreetMap contributors'
+        attribution: '&copy; OpenStreetMap contributors'
     }
 ).addTo(map);
 
 
-/* =====================================================
-   MAP VARIABLES
-===================================================== */
-
 let tankerMarker = null;
 
-let startMarker = null;
-
-let endMarker = null;
-
-let routeLine = null;
-
-let globalHistory = [];
-
-let tripStarted = false;
-
 
 /* =====================================================
-   UPDATE LIVE MARKER
+   UPDATE MAP
 ===================================================== */
 
 function updateMap(latitude, longitude) {
@@ -798,13 +550,9 @@ function updateMap(latitude, longitude) {
         latitude === undefined ||
         longitude === undefined ||
         latitude === 0 ||
-        longitude === 0 ||
-        isNaN(latitude) ||
-        isNaN(longitude)
+        longitude === 0
     ) {
-
         return;
-
     }
 
 
@@ -816,433 +564,17 @@ function updateMap(latitude, longitude) {
 
     if (tankerMarker === null) {
 
-        tankerMarker =
-            L.marker(position)
+        tankerMarker = L.marker(position)
             .addTo(map)
-            .bindPopup(
-                "🚛 Smart Water Tanker"
-            );
+            .bindPopup("🚛 Smart Water Tanker");
 
-        map.setView(
-            position,
-            16
-        );
+        map.setView(position, 16);
 
-    }
+    } else {
 
-    else {
-
-        tankerMarker.setLatLng(
-            position
-        );
+        tankerMarker.setLatLng(position);
 
     }
-
-}
-
-
-/* =====================================================
-   DRAW GLOBAL ROUTE
-===================================================== */
-
-function drawGlobalRoute(history) {
-
-    if (!history ||
-        history.length === 0) {
-
-        return;
-
-    }
-
-
-    const points = [];
-
-
-    history.forEach(item => {
-
-        const lat =
-            Number(item.latitude);
-
-        const lng =
-            Number(item.longitude);
-
-
-        if (
-            !isNaN(lat) &&
-            !isNaN(lng) &&
-            lat !== 0 &&
-            lng !== 0
-        ) {
-
-            points.push([
-                lat,
-                lng
-            ]);
-
-        }
-
-    });
-
-
-    if (points.length === 0) {
-
-        return;
-
-    }
-
-
-    /* Remove old route */
-
-    if (routeLine !== null) {
-
-        map.removeLayer(
-            routeLine
-        );
-
-    }
-
-
-    if (startMarker !== null) {
-
-        map.removeLayer(
-            startMarker
-        );
-
-    }
-
-
-    if (endMarker !== null) {
-
-        map.removeLayer(
-            endMarker
-        );
-
-    }
-
-
-    /* Draw route */
-
-    routeLine =
-        L.polyline(
-            points,
-            {
-                weight: 5,
-                opacity: 0.9
-            }
-        ).addTo(map);
-
-
-    /* START */
-
-    startMarker =
-        L.marker(
-            points[0]
-        )
-        .addTo(map)
-        .bindPopup(
-            "📍 Trip Start"
-        );
-
-
-    /* END */
-
-    endMarker =
-        L.marker(
-            points[points.length - 1]
-        )
-        .addTo(map)
-        .bindPopup(
-            "🏁 Latest / Trip End"
-        );
-
-
-    /* Fit route */
-
-    map.fitBounds(
-        routeLine.getBounds(),
-        {
-            padding: [20,20]
-        }
-    );
-
-}
-
-
-/* =====================================================
-   LOAD GLOBAL HISTORY
-===================================================== */
-
-async function loadGlobalHistory() {
-
-    try {
-
-        document.getElementById(
-            "historySummary"
-        ).innerText =
-            "Loading global GPS history...";
-
-
-        const response =
-            await fetch(
-                BACKEND_URL +
-                "/history?t=" +
-                Date.now(),
-                {
-                    method: "GET",
-                    cache: "no-store"
-                }
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "History backend error"
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        if (!Array.isArray(data)) {
-
-            throw new Error(
-                "Invalid history data"
-            );
-
-        }
-
-
-        /* Backend sends newest first.
-           Reverse it for route order. */
-
-        globalHistory =
-            data.slice().reverse();
-
-
-        drawGlobalRoute(
-            globalHistory
-        );
-
-
-        displayHistory(
-            data
-        );
-
-
-        document.getElementById(
-            "historySummary"
-        ).innerText =
-            "🌐 Global GPS History: " +
-            data.length +
-            " records loaded from Render.";
-
-
-        console.log(
-            "GLOBAL HISTORY:",
-            data
-        );
-
-    }
-
-    catch(error) {
-
-        console.error(
-            "History error:",
-            error
-        );
-
-
-        document.getElementById(
-            "historySummary"
-        ).innerText =
-            "Unable to load global history.";
-
-    }
-
-}
-
-
-/* =====================================================
-   DISPLAY HISTORY
-===================================================== */
-
-function displayHistory(data) {
-
-    const list =
-        document.getElementById(
-            "historyList"
-        );
-
-
-    if (
-        !data ||
-        data.length === 0
-    ) {
-
-        list.innerHTML =
-            "No GPS history available.";
-
-        return;
-
-    }
-
-
-    let html = "";
-
-
-    data.forEach(
-        (item, index) => {
-
-            const lat =
-                Number(item.latitude);
-
-
-            const lng =
-                Number(item.longitude);
-
-
-            html += `
-
-                <div class="history-item">
-
-                    <b>
-                        GPS Record ${index + 1}
-                    </b>
-
-                    <br>
-
-                    <span>
-                        🕒 ${item.timestamp || "--"}
-                    </span>
-
-                    <br>
-
-                    <span>
-                        📍 Latitude:
-                        ${lat.toFixed(6)}
-                    </span>
-
-                    <br>
-
-                    <span>
-                        📍 Longitude:
-                        ${lng.toFixed(6)}
-                    </span>
-
-                    <br>
-
-                    <span>
-                        🌡️ Road:
-                        ${item.road_temperature ?? "--"} °C
-                    </span>
-
-                    <br>
-
-                    <span>
-                        🛣️ Condition:
-                        ${item.road_condition ?? "--"}
-                    </span>
-
-                    <br>
-
-                    <span>
-                        🚿 Sprinkler:
-                        ${item.sprinkler_decision ?? "--"}
-                    </span>
-
-                </div>
-
-            `;
-
-        }
-    );
-
-
-    list.innerHTML =
-        html;
-
-}
-
-
-/* =====================================================
-   START NEW TRIP
-===================================================== */
-
-function startNewTrip() {
-
-    tripStarted = true;
-
-
-    document.getElementById(
-        "tripStatus"
-    ).innerText =
-        "Trip Status: 🟢 Trip Started";
-
-
-    /* Clear old visual route */
-
-    if (routeLine !== null) {
-
-        map.removeLayer(
-            routeLine
-        );
-
-        routeLine = null;
-
-    }
-
-
-    if (startMarker !== null) {
-
-        map.removeLayer(
-            startMarker
-        );
-
-        startMarker = null;
-
-    }
-
-
-    if (endMarker !== null) {
-
-        map.removeLayer(
-            endMarker
-        );
-
-        endMarker = null;
-
-    }
-
-
-    /* Reload the global GPS history */
-
-    loadGlobalHistory();
-
-}
-
-
-/* =====================================================
-   END TRIP
-===================================================== */
-
-function endTrip() {
-
-    tripStarted = false;
-
-
-    document.getElementById(
-        "tripStatus"
-    ).innerText =
-        "Trip Status: 🏁 Trip Ended";
-
-
-    /* Reload latest global history */
-
-    loadGlobalHistory();
 
 }
 
@@ -1251,40 +583,32 @@ function endTrip() {
    WATER LEVEL
 ===================================================== */
 
-function calculateWaterLevel(
-    distance
-) {
+function calculateWaterLevel(distance) {
 
     if (
         distance === undefined ||
         distance === null ||
-        distance < 0 ||
-        isNaN(distance)
+        distance < 0
     ) {
-
         return "--";
-
     }
 
+
+    /*
+       Adjust this value according
+       to your actual tanker height.
+    */
 
     const MAX_DISTANCE = 100;
 
 
     let percentage =
-        (
-            (MAX_DISTANCE - distance) /
-            MAX_DISTANCE
-        ) * 100;
+        ((MAX_DISTANCE - distance) /
+        MAX_DISTANCE) * 100;
 
 
     percentage =
-        Math.max(
-            0,
-            Math.min(
-                100,
-                percentage
-            )
-        );
+        Math.max(0, Math.min(100, percentage));
 
 
     return percentage.toFixed(0);
@@ -1296,25 +620,26 @@ function calculateWaterLevel(
    SPRINKLER DISPLAY
 ===================================================== */
 
-function updateSprinklerDisplay(
-    data
-) {
+function updateSprinklerDisplay(data) {
 
     const temperature =
-        Number(
-            data.road_temperature || 0
-        );
-
+        Number(data.road_temperature || 0);
 
     const road =
-        String(
-            data.road_condition ||
-            "UNKNOWN"
-        ).toUpperCase();
+        String(data.road_condition || "UNKNOWN")
+        .toUpperCase();
 
 
-    let expectedSprinkler =
-        "OFF";
+    /*
+       IMPORTANT:
+
+       The ESP32 is the actual controller.
+
+       Dashboard only verifies/displays
+       the expected condition.
+    */
+
+    let expectedSprinkler = "OFF";
 
 
     if (
@@ -1322,62 +647,56 @@ function updateSprinklerDisplay(
         road === "DRY"
     ) {
 
-        expectedSprinkler =
-            "ON";
+        expectedSprinkler = "ON";
 
     }
 
 
+    /*
+       Actual value received from ESP32
+    */
+
     const actualSprinkler =
         String(
-            data.sprinkler_decision ||
-            "UNKNOWN"
+            data.sprinkler_decision || "UNKNOWN"
         ).toUpperCase();
 
 
     document.getElementById(
         "sprinkler"
-    ).innerText =
-        actualSprinkler;
+    ).innerText = actualSprinkler;
 
 
     document.getElementById(
         "liveSprinkler"
-    ).innerText =
-        actualSprinkler;
+    ).innerText = actualSprinkler;
 
 
-    if (
-        actualSprinkler === "ON"
-    ) {
+    /*
+       Show actual decision from ESP32.
+    */
+
+    if (actualSprinkler === "ON") {
 
         document.getElementById(
             "sprinkler"
-        ).style.color =
-            "#00ff88";
-
+        ).style.color = "#00ff88";
 
         document.getElementById(
             "liveSprinkler"
-        ).style.color =
-            "#00ff88";
+        ).style.color = "#00ff88";
 
     }
 
-    else if (
-        actualSprinkler === "OFF"
-    ) {
+    else if (actualSprinkler === "OFF") {
 
         document.getElementById(
             "sprinkler"
-        ).style.color =
-            "#ff7070";
-
+        ).style.color = "#ff7070";
 
         document.getElementById(
             "liveSprinkler"
-        ).style.color =
-            "#ff7070";
+        ).style.color = "#ff7070";
 
     }
 
@@ -1385,17 +704,21 @@ function updateSprinklerDisplay(
 
         document.getElementById(
             "sprinkler"
-        ).style.color =
-            "white";
-
+        ).style.color = "white";
 
         document.getElementById(
             "liveSprinkler"
-        ).style.color =
-            "white";
+        ).style.color = "white";
 
     }
 
+
+    /*
+       Optional console check.
+
+       This helps you verify whether
+       ESP32 decision matches the rule.
+    */
 
     console.log(
         "Expected:",
@@ -1412,7 +735,7 @@ function updateSprinklerDisplay(
 
 
 /* =====================================================
-   GET LIVE DATA
+   GET DATA
 ===================================================== */
 
 async function updateDashboard() {
@@ -1514,9 +837,7 @@ async function updateDashboard() {
         document.getElementById(
             "waterLevel"
         ).innerText =
-            calculateWaterLevel(
-                distance
-            );
+            calculateWaterLevel(distance);
 
 
         /* ============================
@@ -1567,9 +888,7 @@ async function updateDashboard() {
            SPRINKLER
         ============================ */
 
-        updateSprinklerDisplay(
-            data
-        );
+        updateSprinklerDisplay(data);
 
 
         /* ============================
@@ -1595,6 +914,7 @@ async function updateDashboard() {
         ).innerText =
             "LIVE";
 
+
     }
 
     catch(error) {
@@ -1616,37 +936,18 @@ async function updateDashboard() {
 
 
 /* =====================================================
-   INITIAL LOAD
+   AUTO UPDATE
 ===================================================== */
 
 updateDashboard();
 
-loadGlobalHistory();
-
-
-/* =====================================================
-   AUTO UPDATE
-===================================================== */
 
 setInterval(
     updateDashboard,
     2000
 );
 
-
-/*
-   Refresh global route periodically.
-   This means GPS points received by Render
-   become visible on every device.
-*/
-
-setInterval(
-    loadGlobalHistory,
-    10000
-);
-
 </script>
 
 </body>
-
 </html>
